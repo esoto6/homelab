@@ -1,0 +1,51 @@
+# Ansible for K3S
+
+## Create `inventory.yml` file
+
+Create this file inside the `ansible` folder
+
+```
+all:
+  hosts:
+    k3s_master:
+      ansible_host: 192.xxx.x.x1
+    k3s_worker_1:
+      ansible_host: 192.xxx.x.x2
+    k3s_worker_2:
+      ansible_host: 192.xxx.x.x3
+  children:
+    k3s_cluster:
+      hosts:
+        k3s_master:
+        k3s_worker_1:
+        k3s_worker_2:
+    k3s_workers:
+      hosts:
+        k3s_worker_1:
+        k3s_worker_2:
+```
+
+Check to ensure that Ansible is able to connect to all the hosts
+```sh
+ansible -i inventory.ini all -m ping
+```
+
+
+
+
+Run Ansible Script
+```sh
+ansible-playbook install_k3s.yml
+```
+
+If script successfull you can now ssh to the master node and run the below command
+
+```sh
+kubectl get nodes
+kubectl get pods -A
+```
+![Results get nodes and pods](/docs/get-nodes.png)
+
+If you see you master node and two worker nodes it has been set up successfully. 
+
+

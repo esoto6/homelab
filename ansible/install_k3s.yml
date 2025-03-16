@@ -1,0 +1,40 @@
+---
+- name: Install K3s on Master
+  hosts: k3s_master
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Download K3s install script
+      ansible.builtin.get_url:
+        url: "https://get.k3s.io"
+        dest: "/tmp/k3s_install.sh"
+        mode: "0755"
+
+    - name: Install K3s Master
+      ansible.builtin.command: "/tmp/k3s_install.sh"
+    - name: Get K3s Token
+      ansible.builtin.command: "cat /var/lib/rancher/k3s/server/node-token"
+      register: k3s_token
+
+    - name: Set K3s Token as a fact for all hosts
+      ansible.builtin.set_fact:
+        k3s_token: "{{ k3s_token.stdout }}"
+
+- name: Install K3s on Workers
+  hosts: k3s_workers
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Download K3s install script
+      ansible.builtin.get_url:
+        url: "https://get.k3s.io"
+        dest: "/tmp/k3s_install.sh"
+        mode: "0755"
+
+    - name: Install K3s Worker
+      ansible.builtin.shell: |
+        K3S_URL="https://{{ hostvars['k3s_master']['ansible_host'] }}:6443" \
+        K3S_TOKEN="{{ hostvars['k3s_master'].k3s_token }}" \
+        sh /tmp/k3s_install.sh
