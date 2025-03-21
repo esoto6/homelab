@@ -5,6 +5,14 @@
   vars_files:
     - vars.yml
   tasks:
+    - name: Ensure required packages are installed
+      ansible.builtin.apt:
+        name:
+          - python3-pip
+          - python3-kubernetes
+          - openssl
+        state: present
+
     - name: Download K3s install script
       ansible.builtin.get_url:
         url: "https://get.k3s.io"
@@ -38,3 +46,29 @@
         K3S_URL="https://{{ hostvars['k3s_master']['ansible_host'] }}:6443" \
         K3S_TOKEN="{{ hostvars['k3s_master'].k3s_token }}" \
         sh /tmp/k3s_install.sh
+
+- name: Ensure K3s is Healthy
+  hosts: k3s_master
+  become: true
+  tasks:
+    - name: Wait for kubeconfig file to be available
+      ansible.builtin.wait_for:
+        path: "/etc/rancher/k3s/k3s.yaml"
+        state: present
+        timeout: 300
+
+    - name: Wait for K3s API to be available
+      ansible.builtin.command: "kubectl get nodes"
+      register: kubectl_result
+      until: kubectl_result.rc == 0
+      retries: 30
+      delay: 10
+      changed_when: false
+
+    - name: Wait for all nodes to be Ready
+      ansible.builtin.shell: "kubectl get nodes --no-headers | awk '{print $2}' | grep -v 'Ready' | wc -l"
+      register: not_ready_nodes
+      until: not_ready_nodes.stdout | int == 0
+      retries: 30
+      delay: 10
+      changed_when: false

@@ -18,7 +18,7 @@ provider "proxmox" {
 
 resource "proxmox_vm_qemu" "k3s_node" {
   count  = length(var.vm_name)
-  vmid   = 400 + count.index
+  vmid   = 500 + count.index
   name   = var.vm_name[count.index]
   agent  = 1
   cores  = var.cpu_cores
@@ -32,7 +32,7 @@ resource "proxmox_vm_qemu" "k3s_node" {
   vm_state         = "running"
   automatic_reboot = true
 
-  cicustom   = "vendor=local:snippets/qemu-guest-agent.yml"
+  cicustom   = "vendor=local:snippets/ubuntu.yml"
   ciupgrade  = true
   ciuser     = "root"
   cipassword = var.cloud_init_password
