@@ -11,10 +11,15 @@ This homelab will serve as a testing ground for K3s running on Proxmox, with inf
 The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hardware has 4 cores, 16GM RAM, and SSD storage which is sufficient K3s. This setup is designed to get me introduced to new tools and technologies and expand to dedicated hardware in the future utilizing old hardware running Kubernetes.
 
 ## Pre-Requisites
-- Install Terraform
-- Install Ansible
+- [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
+- Install Ansible via pip
+```sh
+sudo apt install python3-pip
+pip install --user ansible
+export PATH=$PATH:~/.local/bin
+```
 
 # Sections
 - 1. [Proxmox](/docs/PROXMOX.md)
-- 2. [Terraform](/docs/TERRAFORM.md)
-- 3. [Ansible](/docs/ANSIBLE.md)
+- 1. [Terraform](/docs/TERRAFORM.md)
+- 2. [Ansible](/docs/ANSIBLE.md)

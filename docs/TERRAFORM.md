@@ -1,30 +1,5 @@
 # Terraform Setup for Kubernetes Homelab (Proxmox)
 
-## Create cloud-init template
-
-Instructions on creating a template can be found in the documentation located [here](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs/guides/cloud-init%2520getting%2520started#creating-a-cloud-init-template).
-
-# Generate SSH key for Proxmox
-
-On your local machine create the private / public key for SSH
-```sh
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_proxmox -N ""
-```
-
->[!NOTE]
->
-> Upon completion of creating the VMs I found that i needed to manually connect to the server as I had some issues with ansible.
->
-
-```
-ssh root@ip.address
-```
-Connect with 
->[!IMPORTANT]
->
-> Creating a snippet is very important in this step as the template will not work with out having `qemu-guest-agent`
->
-
 # Configure Variables
 
 1. Create file `terraform.tfvars`
