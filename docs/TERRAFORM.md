@@ -5,7 +5,8 @@
 1. Create file `terraform.tfvars`
 
 ```
-proxmox_password    = "password
+proxmox_host        = "192.168.1.5"
+proxmox_password    = "password"
 proxmox_node        = "yourNode"
 cloud_init_password = "initPassword"
 vm_name = ["k3s-master", "k3s-worker-1", "k3s-worker-2"]

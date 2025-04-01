@@ -10,7 +10,7 @@ terraform {
 
 
 provider "proxmox" {
-  pm_api_url      = "https://${var.proxmox_host}:8006/api2/json"
+  pm_api_url      = "https://${var.proxmox_host_ip}:8006/api2/json"
   pm_user         = "root@pam"
   pm_password     = var.proxmox_password
   pm_tls_insecure = true
@@ -18,7 +18,7 @@ provider "proxmox" {
 
 resource "proxmox_vm_qemu" "k3s_node" {
   count  = length(var.vm_name)
-  vmid   = 500 + count.index
+  vmid   = 600 + count.index
   name   = var.vm_name[count.index]
   agent  = 1
   cores  = var.cpu_cores
@@ -39,7 +39,7 @@ resource "proxmox_vm_qemu" "k3s_node" {
 
   os_type   = "cloud-init"
   ipconfig0 = "ip=${var.ip_addresses[count.index]}/24,gw=${var.gateway}"
-  sshkeys = file("~/.ssh/id_rsa_proxmox.pub")
+  sshkeys   = file("~/.ssh/id_rsa_proxmox.pub")
 
   serial {
     id = 0
