@@ -68,20 +68,3 @@ spec:
   dnsNames:
     - test-site.rubberduckops.com
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-site
-  namespace: dev 
-spec:
-  ports:
-    - name: http 
-      port: 80
-      targetPort: 80
-    - name: https
-      port: 443
-      targetPort: 8080
-  selector:
-    app.kubernetes.io/name: nginx-site
-  type: LoadBalancer
