@@ -7,7 +7,7 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   rules:
-    - host: argocd.yourdomain.com
+    - host: argocd.rubberduckops.com
       http:
         paths:
         - path: /
