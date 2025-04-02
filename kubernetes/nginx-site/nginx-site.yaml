@@ -26,6 +26,8 @@ spec:
           ports:
             - name: http
               containerPort: 80
+            - name: https 
+              containerPort: 443
           resources:
             limits:
               memory: "256Mi"
@@ -74,10 +76,12 @@ metadata:
   namespace: dev 
 spec:
   ports:
-    - port: 80
+    - name: http 
+      port: 80
       targetPort: 80
-    - port: 443
-      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 8080
   selector:
     app.kubernetes.io/name: nginx-site
   type: LoadBalancer
