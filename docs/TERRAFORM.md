@@ -5,7 +5,7 @@
 1. Create file `terraform.tfvars`
 
 ```
-proxmox_host        = "192.168.1.5"
+proxmox_host_ip        = "192.168.1.5"
 proxmox_password    = "password"
 proxmox_node        = "yourNode"
 cloud_init_password = "initPassword"

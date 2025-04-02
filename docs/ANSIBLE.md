@@ -27,14 +27,15 @@ all:
 
 ## Ansible Variables
 
-### vars.yml
+
+### Update `vars.yml` file
 Update ip range for metallb to an address range within your network
 
 ```sh
 metallb_ip_range: "192.168.1.93-192.168.1.99"
 ```
 
-### secrets.yml
+### Create `secrets.yml` file
 
 > [!NOTE]
 > You will need to create this file.
