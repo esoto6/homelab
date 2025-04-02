@@ -1,4 +1,4 @@
-variable "proxmox_host" {
+variable "proxmox_host_ip" {
   description = "Proxmox Host URL"
   type        = string
 }

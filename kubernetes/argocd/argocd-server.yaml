@@ -43,27 +43,27 @@ spec:
   type: LoadBalancer
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: argocd-server
   namespace: argocd
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: "websecure" 
-    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
-  rules:
-    - host: argocd.rubberduckops.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  name: https 
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`argocd.rubberduckops.com`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: argocd-server
+          port: 80
+    - kind: Rule
+      match: Host(`argocd.example.com`) && Header(`Content-Type`, `application/grpc`)
+      priority: 11
+      services:
+        - name: argocd-server
+          port: 80
+          scheme: h2c
   tls:
-    - hosts:
-        - argocd.rubberduckops.com  
-      secretName: argocd-tls
+    certResolver: default
