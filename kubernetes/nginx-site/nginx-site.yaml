@@ -75,9 +75,9 @@ metadata:
 spec:
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80
     - port: 443
-      targetPort: 8080
+      targetPort: 80
   selector:
     app.kubernetes.io/name: nginx-site
   type: LoadBalancer
