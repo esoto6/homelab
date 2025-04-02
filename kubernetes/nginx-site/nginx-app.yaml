@@ -4,14 +4,13 @@ metadata:
   name: nginx-site
   namespace: argocd
 spec:
-  project: default
+  destination:
+    namespace: dev
+    server: https://kubernetes.default.svc
   source:
+    path: kubernetes/nginx-site 
     repoURL: https://github.com/esoto6/homelab.git
     targetRevision: master
-    path: kubernetes/nginx-site 
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: dev
   syncPolicy:
     automated:
       prune: true
