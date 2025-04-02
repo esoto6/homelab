@@ -35,7 +35,23 @@ spec:
             requests:
               memory: "128Mi"
               cpu: "100m"
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-site
+  namespace: dev
+spec:
+  selector:
+    app: nginx
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 443
+  type: LoadBalancer
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
