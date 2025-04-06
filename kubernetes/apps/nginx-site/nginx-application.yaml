@@ -1,17 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root-app
+  name: nginx-site
   namespace: argocd
 spec:
   project: default
   destination:
-    namespace: argocd
+    name: "" 
+    namespace: default
     server: https://kubernetes.default.svc
   source:
     repoURL: https://github.com/esoto6/homelab.git
     targetRevision: master
-    path: kubernetes/apps
+    path: kubernetes/apps/nginx-site 
   syncPolicy:
     automated:
       prune: true
