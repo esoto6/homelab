@@ -6,15 +6,15 @@ metadata:
 spec:
   project: default
   destination:
+    name: "" 
     namespace: argocd
     server: https://kubernetes.default.svc
   source:
-    path: kubernetes/argocd
-    repoURL: https://github.com/esoto6/homelab.git
-    targetRevision: master
+    repoURL: 'https://charts.argoproj.io' 
+    targetRevision: 'v3.30.0'
+    values:
+      path: kubernetes/apps/argocd/values.yaml
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true

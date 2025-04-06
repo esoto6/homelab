@@ -15,7 +15,7 @@ ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_proxmox -N ""
 
 
 
-# Create a snippet to be used for the cloud-init
+# Create a script snippet to be used for the cloud-init
 
 
 >[!IMPORTANT]

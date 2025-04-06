@@ -4,36 +4,52 @@
   vars_files:
     - vars.yml
 
-
   tasks:
     - name: Set local kubeconfig path
       delegate_to: localhost
       set_fact:
         kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
 
-    - name: Ensure local .kube directory exists
-      delegate_to: localhost
-      file:
-        path: "{{ lookup('env', 'HOME') }}/.kube"
-        state: directory
-        mode: '0700'
+    # - name: Ensure local .kube directory exists
+    #   delegate_to: localhost
+    #   become: false
+    #   file:
+    #     path: "{{ lookup('env', 'HOME') }}/.kube"
+    #     state: directory
+    #     mode: '0700'
+    #     owner: "{{ lookup('env', 'USER') }}"
+    #     group: "{{ lookup('env', 'USER') }}"
 
-    - name: Fetch kubeconfig from K3s master
-      fetch:
-        src: "/etc/rancher/k3s/k3s.yaml"
-        dest: "{{ kubeconfig_path }}"
-        flat: yes
+    # - name: Ensure destination directory for kubeconfig exists
+    #   delegate_to: localhost
+    #   become: false
+    #   file:
+    #     path: "{{ kubeconfig_path | dirname }}"
+    #     state: directory
+    #     mode: '0700'
 
-    - name: Update kubeconfig with correct K3s master IP
-      delegate_to: localhost
-      shell: |
-        sed -i 's/127.0.0.1/{{ k3s_master_ip }}/g' {{ kubeconfig_path }}
+    # - name: Fetch kubeconfig from K3s master
+    #   delegate_to: localhost
+    #   become: false
+    #   fetch:
+    #     src: "/etc/rancher/k3s/k3s.yaml"
+    #     dest: "{{ kubeconfig_path }}"
+    #     flat: yes
 
-    - name: Set permissions for kubeconfig
-      delegate_to: localhost
-      file:
-        path: "{{ kubeconfig_path }}"
-        mode: '0600'
+    # - name: Update kubeconfig with correct K3s master IP
+    #   delegate_to: localhost
+    #   become: false
+    #   shell: |
+    #     sed -i 's/127.0.0.1/{{ k3s_master_ip }}/g' {{ kubeconfig_path }}
+
+    # - name: Set permissions for kubeconfig
+    #   delegate_to: localhost
+    #   become: false
+    #   file:
+    #     path: "{{ kubeconfig_path }}"
+    #     mode: '0600'
+    #     owner: "{{ lookup('env', 'USER') }}"
+    #     group: "{{ lookup('env', 'USER') }}"
 
 - name: Deploy MetalLB on K3s
   hosts: localhost
