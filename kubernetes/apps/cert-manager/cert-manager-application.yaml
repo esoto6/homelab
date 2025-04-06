@@ -12,8 +12,6 @@ spec:
     repoURL: 'https://charts.jetstack.io' 
     chart: cert-manager
     targetRevision: v1.17.1
-    valuesFiles:
-      - kubernetes/apps/cert-manager/values.yaml
   syncPolicy:
     automated:
       prune: true

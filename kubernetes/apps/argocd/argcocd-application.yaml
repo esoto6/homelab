@@ -12,8 +12,10 @@ spec:
     repoURL: 'https://charts.argoproj.io'
     targetRevision: '7.8.23' 
     chart: argo-cd
-    valuesFiles:
-      - kubernetes/apps/argocd/values.yaml 
+    helm:
+      values: |
+        global:
+          domain: argocd.rubberduckops.com
   syncPolicy:
     automated:
       prune: true
