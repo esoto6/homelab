@@ -53,4 +53,5 @@ secrets.yml
 *.vscode
 
 kubernetes/apps/nginx-site
-kubernetes/core/
+kubernetes/core/grafana
+kubernetes/core/prometheus
