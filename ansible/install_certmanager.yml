@@ -47,7 +47,21 @@
           data:
             api-token: "{{ lookup('ansible.builtin.env', 'CLOUDFLARE_API_TOKEN') | b64encode }}"
         kubeconfig: "{{ kubeconfig_path }}"
-
+   
+    - name: Create Secret for Cloudflare API Token
+      kubernetes.core.k8s:
+        state: present
+        namespace: cert-manager
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: cloudflare-api-token-secret
+          type: Opaque
+          data:
+            api-token: "{{ cloudflare_token | b64encode }}"
+        kubeconfig: "{{ kubeconfig_path }}"
+    
     - name: Create ClusterIssuer for Let's Encrypt
       kubernetes.core.k8s:
         state: present
@@ -71,16 +85,3 @@
                         key: api-token
         kubeconfig: "{{ kubeconfig_path }}"
 
-    - name: Create Secret for Cloudflare API Token
-      kubernetes.core.k8s:
-        state: present
-        namespace: cert-manager
-        definition:
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: cloudflare-api-token-secret
-          type: Opaque
-          data:
-            api-token: "{{ cloudflare_token | b64encode }}"
-        kubeconfig: "{{ kubeconfig_path }}"

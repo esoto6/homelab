@@ -57,6 +57,24 @@ ansible -i inventory.ini all -m ping
 Run Ansible Script
 ```sh
 ansible-playbook install_k3s.yml
+```
+
+Manually copy k3s.yaml file from master_node and copy to local .kube
+```
+scp user@master-ip:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+```
+
+Update ~/.kube/config with the correct master ip in file in `server` section.
+
+You can now run kubectl commands locally to test everything is working as expected.
+```
+kubectl cluster-info # Return details about cluster
+kubectl get nodes # You should see all of your machines
+kubectl get pods -A # All pods
+```
+
+Now that kubectl is working correctly we can install the reamining two services.
+```
 ansible-playbook install_metallb.yml --ask-become-pass
 ansible-playbook install_certmanager.yml
 ```
@@ -64,11 +82,7 @@ ansible-playbook install_certmanager.yml
 If script is successfull you can now using your machine run the below commands to check everything is working as expected.
 
 ```sh
-kubectl get nodes
 kubectl get pods -A
 ```
 ![Results get nodes and pods](/docs/get-nodes.png)
-
-If you see you master node and two worker nodes it has been set up successfully. 
-
 
