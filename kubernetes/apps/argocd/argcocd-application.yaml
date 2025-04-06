@@ -6,14 +6,14 @@ metadata:
 spec:
   project: default
   destination:
-    name: "" 
     namespace: argocd
     server: https://kubernetes.default.svc
   source:
-    repoURL: 'https://charts.argoproj.io' 
-    targetRevision: 'v2.14.9'
-    values:
-      path: kubernetes/apps/argocd/values.yaml
+    repoURL: 'https://charts.argoproj.io'
+    targetRevision: '7.8.23' 
+    chart: argo-cd
+    valuesFiles:
+      - kubernetes/apps/argocd/values.yaml 
   syncPolicy:
     automated:
       prune: true

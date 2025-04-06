@@ -53,3 +53,4 @@ secrets.yml
 *.vscode
 
 kubernetes/old-test
+misc.md
