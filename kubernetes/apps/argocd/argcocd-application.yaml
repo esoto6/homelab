@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     repoURL: 'https://charts.argoproj.io' 
-    targetRevision: '2.0.2'
+    targetRevision: 'v2.14.9'
     values:
       path: kubernetes/apps/argocd/values.yaml
   syncPolicy:
