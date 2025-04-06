@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/esoto6/homelab.git
     targetRevision: master
-    path: kubernetes/apps
+    path: kubernetes
   syncPolicy:
     automated:
       prune: true
