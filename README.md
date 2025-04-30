@@ -20,6 +20,5 @@ export PATH=$PATH:~/.local/bin
 ```
 
 # Sections
-- 1. [Proxmox](/docs/PROXMOX.md)
-- 1. [Terraform](/docs/TERRAFORM.md)
-- 2. [Ansible](/docs/ANSIBLE.md)
+- 1. [Proxmox / Terraform](https://github.com/esoto6/terraform-proxmox)
+- 2. [Ansible](https://github.com/techno-tim/k3s-ansible)

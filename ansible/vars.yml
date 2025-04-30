@@ -1,6 +1,0 @@
----
-k3s_version: "latest"
-k3s_install_url: "https://get.k3s.io"
-k3s_master_ip: "{{ hostvars['k3s_master']['ansible_host'] }}"
-metallb_ip_range: "192.168.1.155-192.168.1.165"
-

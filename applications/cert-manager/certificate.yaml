@@ -1,0 +1,27 @@
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   namespace: cert-manager
+#   name: rubberduckops-tls-prd
+# spec:
+#   secretName: rubberduckops-tls-prd
+#   issuerRef:
+#     name: letsencrypt-prod  
+#     kind: ClusterIssuer
+#   dnsNames:
+#     - "*.rubberduckops.com"
+# ---
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  namespace: cert-manager
+  name: rubberduckops-tls-stg
+spec:
+  secretName: rubberduckops-tls-stg
+  issuerRef:
+    name: letsencrypt-stg
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.rubberduckops.com"
