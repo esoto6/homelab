@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/esoto6/homelab
+    repoURL: https://github.com/esoto6/homelab.git
     targetRevision: HEAD
     path: applications/nginx
   destination:
