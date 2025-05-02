@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: nginx-app
+  name: nginx
 
 ---
 apiVersion: apps/v1
