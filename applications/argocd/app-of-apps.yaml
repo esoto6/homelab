@@ -9,6 +9,8 @@ spec:
     repoURL: https://github.com/esoto6/homelab.git
     targetRevision: HEAD
     path: applications
+    directory:
+      recurse: true
   destination:
     namespace: argocd
     server: https://kubernetes.default.svc
