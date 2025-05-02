@@ -10,7 +10,7 @@ spec:
     targetRevision: HEAD
     path: applications/nginx
   destination:
-    namespace: nginx-site
+    namespace: nginx
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
