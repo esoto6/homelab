@@ -1,5 +1,4 @@
 installCRDs: true
-controller:
-  config:
-    kustomize:
-      buildOptions: "--enable-helm"
+configs:
+  cm:
+    kustomize.buildOptions: "--enable-helm"
