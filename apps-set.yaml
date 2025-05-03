@@ -16,6 +16,9 @@ spec:
           - name: argocd
             path: applications/argocd/base
             namespace: argocd
+          - name: cattle-system
+            path: applications/rancher/overlays/dev
+            namespace: cattle-system
   template:
     metadata:
       name: '{{name}}'
