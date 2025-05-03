@@ -1,0 +1,5 @@
+installCRDs: true
+controller:
+  config:
+    kustomize:
+      buildOptions: "--enable-helm"

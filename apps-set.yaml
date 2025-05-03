@@ -13,6 +13,8 @@ spec:
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
+          - name: argocd
+            path: applications/argocd/base
   template:
     metadata:
       name: '{{name}}'
