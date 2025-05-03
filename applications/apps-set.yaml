@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: homelab-apps
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: cert-manager
+            path: applications/cert-manager/overlays/dev
+            namespace: cert-manager
+          - name: nginx
+            path: applications/nginx/overlays/dev
+            namespace: nginx
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/esoto6/homelab.git
+        targetRevision: HEAD
+        path: '{{path}}'
+        kustomize:
+          enableHelm: true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

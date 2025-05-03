@@ -55,3 +55,5 @@ secrets.yml
 kubernetes/old-test
 misc.md
 kubernetes/external-secrets/secret.yaml
+
+charts*
