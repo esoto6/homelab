@@ -10,15 +10,12 @@ spec:
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
-            annotations: {}
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
-            annotations: {}
           - name: argocd
             path: applications/argocd/base
-            annotations: 
-              kustomize.buildOptions: "--enable-helm"
+            namespace: argocd
   template:
     metadata:
       name: '{{name}}'
