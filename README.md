@@ -6,19 +6,54 @@ I started this project to learn new tools and technologies while upgrading my ho
 
 This homelab will serve as a testing ground for K3s running on Proxmox, with infrastructure managed using Terraform and configuration handled by Ansible. Everything will be deployed using ArgoCD to enable GitOps workflows, while Prometheus and Grafana will provide monitoring and alerting.
 
-## Infrastructure
+### Infrastructure
 
 The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hardware has 4 cores, 16GM RAM, and SSD storage which is sufficient K3s. This setup is designed to get me introduced to new tools and technologies and expand to dedicated hardware in the future utilizing old hardware running Kubernetes.
 
-## Pre-Requisites
-- [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
-- Install Ansible via pip
-```sh
-sudo apt install python3-pip
-pip install --user ansible
-export PATH=$PATH:~/.local/bin
+### Pre-Requisites
+- Helm
+- Kustomize
+
+
+## Bootstrap Cluster
+
+### Steps
+
+1. Add argocd via helm direct to cluster
+
+```
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
+```
+2. Apply patch to enable-helm with kustomize
+```
+kubectl patch configmap argocd-cm -n argocd --type merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
 ```
 
-# Sections
-- 1. [Proxmox / Terraform](https://github.com/esoto6/terraform-proxmox)
-- 2. [Ansible](https://github.com/techno-tim/k3s-ansible)
+3. Port forward argocd
+```
+k port-forward svc/argocd-server -n argocd 8080:443
+```
+
+4. Get argocd password
+```
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+5. Create Secret for cert-manager
+
+```
+k create namespace cert-manager
+k create secret generic cloudflare-api-token \
+--from-literal=api-token=your-api-token-here \
+-n cert-manager
+```
+
+6. Apply appset to cluster
+```
+k apply -f homelab/app-set.yaml
+```
+
+# [Issues](ISSUES.md)
+

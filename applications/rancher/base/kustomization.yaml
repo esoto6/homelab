@@ -12,8 +12,3 @@ helmCharts:
     version: 2.11.1 
     valuesFile: values.yaml
     includeCRDs: true
-
-
-
-
-
