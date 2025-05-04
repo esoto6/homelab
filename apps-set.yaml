@@ -7,15 +7,15 @@ spec:
   generators:
     - list:
         elements:
+          # - name: argocd
+          #   path: applications/argocd/base
+          #   namespace: argocd
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
-          - name: argocd
-            path: applications/argocd/base
-            namespace: argocd
           - name: cattle-system
             path: applications/rancher/base
             namespace: cattle-system
@@ -35,3 +35,5 @@ spec:
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
