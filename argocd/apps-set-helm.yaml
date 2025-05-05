@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helm-apps
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: rancher
+            namespace: cattle-system
+            path: applications/rancher
+            chart: rancher-latest
+            repo: https://releases.rancher.com/server-charts/latest
+            version: '2.11.1'
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      source:
+        chart: '{{chart}}'
+        repoURL: '{{repo}}'
+        targetRevision: '{{version}}'
+        helm:
+          valueFiles:
+            - '{{path}}/values.yaml'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
