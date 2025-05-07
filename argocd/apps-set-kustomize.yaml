@@ -7,18 +7,21 @@ spec:
   generators:
     - list:
         elements:
-          # - name: argocd
-          #   path: applications/argocd/base
-          #   namespace: argocd
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
+            syncwave: 1
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
+            syncwave: 2
   template:
     metadata:
       name: '{{name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{syncwave}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
       source:
