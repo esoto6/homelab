@@ -14,12 +14,12 @@ spec:
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
-            syncwave: 2
+            sync-wave: 2
   template:
     metadata:
       name: '{{name}}'
       annotations:
-        argocd.argoproj.io/sync-wave: '{{syncwave}}'
+        argocd.argoproj.io/sync-wave: '{{sync-wave}}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:

@@ -12,22 +12,22 @@ spec:
             chart: argo-cd
             repo: https://argoproj.github.io/argo-helm
             version: 7.9.0
-            valueFilePath: applications/argocd/values.yaml
-            syncwave: 0
+            valueFiles: applications/argocd/values.yaml
+            sync-wave: 0
           # - name: rancher
           #   namespace: cattle-system
           #   path: applications/rancher
           #   chart: rancher
           #   repo: https://releases.rancher.com/server-charts/latest
           #   version: '2.11.1'
-          #   valueFilePath: applications/rancher/values.yaml
-          #   syncwave: 3
+          #   valueFiles: applications/rancher/values.yaml
+          #   sync-wave: 3
 
   template:
     metadata:
       name: '{{name}}'
       annotations:
-        argocd.argoproj.io/sync-wave: '{{syncwave}}'
+        argocd.argoproj.io/sync-wave: '{{sync-wave}}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
