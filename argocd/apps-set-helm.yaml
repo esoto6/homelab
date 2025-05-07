@@ -26,8 +26,8 @@ spec:
   template:
     metadata:
       name: '{{name}}'
-      annotations:
-        argocd.argoproj.io/sync-wave: '{{sync-wave}}'
+      # annotations:
+      #   argocd.argoproj.io/sync-wave: '{{sync-wave}}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
@@ -38,7 +38,7 @@ spec:
         targetRevision: '{{version}}'
         helm:
           valueFiles:
-            - '{{path}}/values.yaml'
+            - '{{valueFiles}}'
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{namespace}}'
