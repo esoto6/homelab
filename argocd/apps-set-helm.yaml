@@ -27,7 +27,7 @@ spec:
             chart: trivy-operator
             repo: https://aquasecurity.github.io/helm-charts/
             version: 0.28.0
-            valueFiles: applications/trivy-operator/values.yaml
+            valueFiles: "applications/trivy-operator/values.yaml"
   template:
     metadata:
       name: '{{name}}'
