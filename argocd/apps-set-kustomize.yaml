@@ -12,7 +12,7 @@ spec:
             namespace: cert-manager
             syncwave: 1
           - name: nginx
-            path: applications/nginx/overlays/dev
+            path: ../applications/nginx/overlays/dev
             namespace: nginx
             sync-wave: 2
   template:

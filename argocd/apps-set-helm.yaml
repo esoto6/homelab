@@ -12,7 +12,7 @@ spec:
             chart: argo-cd
             repo: https://argoproj.github.io/argo-helm
             version: 7.9.0
-            valueFiles: applications/argocd/values.yaml
+            valueFiles: ../applications/argocd/values.yaml
             sync-wave: 0
           # - name: rancher
           #   namespace: cattle-system
