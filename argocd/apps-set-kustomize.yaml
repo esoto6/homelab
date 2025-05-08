@@ -16,7 +16,7 @@ spec:
             namespace: nginx
             # sync-wave: 1
           - name: trivy-operator
-            patch: applications/trivy-operator/overlays/dev
+            path: applications/trivy-operator/overlays/dev
             namespace: trivy-system
             # sync-wave: 2
   template:
