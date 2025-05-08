@@ -10,10 +10,14 @@ spec:
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
-            # syncwave: 1
+            # syncwave: 0
           - name: nginx
             path: applications/nginx/overlays/dev
             namespace: nginx
+            # sync-wave: 1
+          - name: trivy-operator
+            patch: applications/trivy-operator/overlays/dev
+            namespace: trivy-system
             # sync-wave: 2
   template:
     metadata:
