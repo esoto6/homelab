@@ -20,7 +20,7 @@ spec:
             namespace: nginx
             # sync-wave: 2
           - name: trivy-operator
-            path: applications/trivy-operator
+            path: applications/trivy-operator/base
             namespace: trivy-system
             # sync-wave: 3
   template:

@@ -59,7 +59,7 @@ k create secret generic cloudflare-api-token \
 
 6. Apply appset to cluster
 ```
-k apply -f homelab/app-set.yaml
+k apply -f bootstrap/app-set.yaml
 ```
 
 # [Issues](ISSUES.md)
