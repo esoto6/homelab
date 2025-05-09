@@ -1,13 +1,12 @@
----
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: nginx-cert
-  namespace: nginx
+  name: local-rubberduckops
+  namespace: traefik
 spec:
-  secretName: letsencrypt-stg
+  secretName: k8s-rubberduckops-staging-tls
   issuerRef:
     name: letsencrypt-stg
     kind: ClusterIssuer
   dnsNames:
-    - nginx.k8s.rubberduckops.com
+    - "*.k8s.rubberduckops.dev"

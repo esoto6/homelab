@@ -31,9 +31,16 @@ helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
 kubectl patch configmap argocd-cm -n argocd --type merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
 ```
 
-3. Port forward argocd
+3. Port forward or implement LoadBalancer argocd
+
+Rancher Desktop
 ```
 k port-forward svc/argocd-server -n argocd 8080:443
+```
+
+K3s
+```
+k patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
 4. Get argocd password

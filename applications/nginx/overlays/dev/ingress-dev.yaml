@@ -8,7 +8,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nginx.rubberduckops.com`)
+    - match: Host(`nginx.k8s.rubberduckops.com`)
       kind: Rule
       services:
         - name: nginx
