@@ -7,6 +7,10 @@ spec:
   generators:
     - list:
         elements:
+          - name: argocd
+            path: applications/argocd
+            namespace: argocd
+            # sync-wave: 0
           - name: external-secrets
             path: applications/external-secrets
             namespace: external-secrets
