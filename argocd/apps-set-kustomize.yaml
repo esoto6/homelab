@@ -7,35 +7,28 @@ spec:
   generators:
     - list:
         elements:
-          - name: argocd
-            path: applications/argocd
-            namespace: argocd
-            # sync-wave: 0
-          - name: external-secrets
-            path: applications/external-secrets
-            namespace: external-secrets
-            # sync-wave: 0
+          # - name: argocd
+          #   path: applications/argocd
+          #   namespace: argocd
+          # - name: external-secrets
+          #   path: applications/external-secrets
+          #   namespace: external-secrets
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
-            # syncwave: 1
-          - name: nginx
-            path: applications/nginx/overlays/dev
-            namespace: nginx
-            # sync-wave: 2
-          - name: trivy-operator
-            path: applications/trivy-operator/base
-            namespace: trivy-system
-            # sync-wave: 3
+            syncwave: "1"
+          # - name: nginx
+          #   path: applications/nginx/overlays/dev
+          #   namespace: nginx
+          # - name: trivy-operator
+          #   path: applications/trivy-operator/base
+          #   namespace: trivy-system
           - name: traefik
             path: applications/traefik
             namespace: traefik
-            # sync-wave: 4
   template:
     metadata:
       name: '{{name}}'
-      # annotations:
-      #   argocd.argoproj.io/sync-wave: '{{sync-wave}}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
