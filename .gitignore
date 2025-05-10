@@ -60,3 +60,4 @@ charts*
 applications/external-secrets/
 secret.yaml
 secretstore.yaml
+values2.yaml
