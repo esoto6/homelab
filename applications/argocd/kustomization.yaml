@@ -8,3 +8,6 @@ helmCharts:
   repo: https://argoproj.github.io/argo-helm
   valuesFile: values.yaml
   version: 8.0.0
+
+resources:
+- ingress-route.yaml
