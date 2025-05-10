@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: local-rubberduckops
-  namespace: traefik
+  namespace: cert-manager
 spec:
   secretName: k8s-rubberduckops-staging-tls
   issuerRef:

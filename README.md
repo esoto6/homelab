@@ -24,7 +24,7 @@ The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hard
 ```
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
-helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace
+helm install argocd argo/argo-cd --version 8.0.0 --namespace argocd --create-namespace
 ```
 2. Apply patch to enable-helm with kustomize
 ```
