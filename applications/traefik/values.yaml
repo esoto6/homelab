@@ -7,8 +7,6 @@ additionalArguments:
   - "--log.level=DEBUG"
 
 ports:
-  web:
-    redirectTo: websecure
   websecure:
     tls: 
       enabled: true
