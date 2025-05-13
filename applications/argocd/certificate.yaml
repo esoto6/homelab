@@ -8,6 +8,5 @@ spec:
   issuerRef:
     name: letsencrypt-stg
     kind: ClusterIssuer
-  commonName: argocd.k8s.rubberduckops.com
   dnsNames:
     - argocd.k8s.rubberduckops.com
