@@ -1,12 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: argocd-tls
+  name: argocd-cert
   namespace: argocd
 spec:
   secretName: argocd-tls
   issuerRef:
-    name: letsencrypt-stg
+    name: letsencrypt-prod
     kind: ClusterIssuer
+  commonName: argocd.rubberduckops.com
   dnsNames:
-    - argocd.k8s.rubberduckops.com
+    - argocd.rubberduckops.com

@@ -8,7 +8,7 @@ This homelab will serve as a testing ground for K3s running on Proxmox, with inf
 
 ### Infrastructure
 
-The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hardware has 4 cores, 16GM RAM, and SSD storage which is sufficient K3s. This setup is designed to get me introduced to new tools and technologies and expand to dedicated hardware in the future utilizing old hardware running Kubernetes.
+The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hardware has 4 cores, 16GM RAM, and SSD storage which is sufficient for K3s. This setup is designed to get me introduced to new tools and technologies and expand to dedicated hardware in the future utilizing old hardware running Kubernetes.
 
 ### Pre-Requisites
 - Helm
@@ -19,47 +19,26 @@ The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hard
 
 ### Steps
 
-1. Add argocd via helm direct to cluster
+#### Terraform - Proxmox
+Utilizing this repo [terraform-proxmox](https://github.com/esoto6/terraform-proxmox) to configure vms on proxmox
 
-```
-helm repo add argo https://argoproj.github.io/argo-helm
-helm repo update
-helm install argocd argo/argo-cd --version 8.0.0 --namespace argocd --create-namespace
-```
-2. Apply patch to enable-helm with kustomize
-```
-kubectl patch configmap argocd-cm -n argocd --type merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
-```
+#### Ansible 
+Initially started using my own ansible steps to initiate k3s. Discovered this repo [k3s-ansible](https://github.com/timothystewart6/k3s-ansible) which I am utilizing to initiate k3s. 
 
-3. Port forward or implement LoadBalancer argocd
+#### Intermediate step
 
-Rancher Desktop
-```
-k port-forward svc/argocd-server -n argocd 8080:443
-```
+I need to figure out how to automate this step. Prep requirements in order for argocd install to go smoothly. 
 
-K3s
-```
-k patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-```
+1. Need external secrets to pull secrets
+2. Once eso is configured need to install cert-manager to create certificates use dns01 challenge
+3. Once certificates are valid use traefik to create ingress routes for apps
 
-4. Get argocd password
-```
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-```
+[Intermediate steps](INTERMEDIATE_STEPS.md)
 
-5. Create Secret for cert-manager
+Once argocd is installed bootstrap cluster
 
-```
-k create namespace cert-manager
-k create secret generic cloudflare-api-token \
---from-literal=api-token=your-api-token-here \
--n cert-manager
-```
-
-6. Apply appset to cluster
-```
-k apply -f bootstrap/app-set.yaml
+```sh
+kubectl apply -f bootstrap/apps-set-kustomize.yaml
 ```
 
 # [Issues](ISSUES.md)

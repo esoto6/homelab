@@ -5,3 +5,5 @@ resources:
 patches:
   - path: deployment-prod.yaml
   - path: service-prod.yaml
+  - path: ingress-prod.yaml
+  - path: certificate-prod.yaml

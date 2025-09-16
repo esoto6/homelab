@@ -11,7 +11,7 @@ spec:
     - match: Host(`nginx.rubberduckops.com`)
       kind: Rule
       services:
-        - name: nginx
+        - name: web-service
           port: 80
   tls:
-    secretName: nginx-tls-prd
+    secretName: nginx-tls

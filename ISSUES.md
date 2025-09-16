@@ -1,24 +1,23 @@
 # Issues
 
 1. When to use kustomize vs helm?
-2. Want to be able to distinguish between using rancher-desktop and cluster
-3. Apply configmap instead of manual patch for argocd
-4. Not 100% working with errors on nginx and argocd
-
+2. Bootstrapping cluster (terraform vs ansible vs helmoperator)
+3. Want to be able to distinguish between using rancher-desktop and cluster
+4. Traefik middleware to redirect http -> https
 
 
 # Apps I want to Install and Manage
-- argocd
-- cert-manager
+- argocd (Still need to use existing secret)
+- cert-manager (wildcard certs)
 - rancher
 - longhorn
-- external-secrets
+- external-secrets (bitwarden)
+    - Utilizing ClusterSecretStore
+    - Need to still push secrets
 - dependency-track
 - CloudNativePG
 - n8n
 
 
 # Topics to continue exploring
-- helm
-- kustomize
 - Storage

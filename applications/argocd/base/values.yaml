@@ -1,0 +1,23 @@
+global:
+  domain: argocd.rubberduckops.com
+configs:
+  cm:
+    kustomize.buildOptions: "--enable-helm"
+  secret:
+    admin:
+      existingSecret: argocd-admin-secret
+server:
+  ingress:
+    enabled: false
+  server:
+    type: ClusterIP
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8080
+      - name: https
+        port: 443
+        targetPort: 8080
+  extraArgs:
+    - --insecure # Disable TLS for the ArgoCD API server due to using an Ingress with TLS termination
+    

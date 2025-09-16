@@ -8,10 +8,10 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nginx.k8s.rubberduckops.com`)
+    - match: Host(`nginx.rubberduckops.com`)
       kind: Rule
       services:
-        - name: nginx
+        - name: web-service
           port: 80
   tls:
-    secretName: k8s-rubberduckops-staging-tls
+    secretName: nginx-tls

@@ -5,9 +5,9 @@ metadata:
   name: nginx-cert
   namespace: nginx
 spec:
-  secretName: letsencrypt-stg
+  secretName: nginx-tls
   issuerRef:
     name: letsencrypt-stg
     kind: ClusterIssuer
   dnsNames:
-    - nginx.k8s.rubberduckops.com
+    - nginx.rubberduckops.com

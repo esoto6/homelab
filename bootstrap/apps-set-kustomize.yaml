@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kustomize-apps
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: argocd
+            path: applications/argocd/overlays/dev
+            namespace: argocd
+          - name: nginx 
+            path: applications/nginx/overlays/dev
+            namespace: ngingx
+  template:
+    metadata:
+      name: '{{name}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/esoto6/homelab.git
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
