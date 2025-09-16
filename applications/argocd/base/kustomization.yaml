@@ -11,6 +11,6 @@ helmCharts:
 
 resources:
 - namespace.yaml
-- ingress-route.yaml
+- ingress.yaml
 - certificate.yaml
 - external-secret-admin.yaml 
