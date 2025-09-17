@@ -11,7 +11,7 @@ spec:
             path: applications/argocd/overlays/dev
             namespace: argocd
           - name: external-secrets
-            path: applications/external-secrets
+            path: applications/external-secrets/base
             namespace: external-secrets-system
           - name: nginx 
             path: applications/nginx/overlays/dev
