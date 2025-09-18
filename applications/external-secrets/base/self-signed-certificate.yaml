@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca-cert
+  namespace: external-secrets-system
+spec:
+  secretName: ca-secret
+  isCA: true
+  commonName: "Bitwarden SDK Server CA"
+  subject:
+    organizationalUnits:
+    - "Bitwarden SDK Server"
+    organizations:
+    - "External Secrets"
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
