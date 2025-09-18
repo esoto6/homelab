@@ -14,7 +14,7 @@ spec:
             path: applications/external-secrets/base
             namespace: external-secrets-system
           - name: traefik
-            path: applications/traefik/overlays/base
+            path: applications/traefik/base
             namespace: traefik
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
