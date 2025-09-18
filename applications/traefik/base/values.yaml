@@ -1,0 +1,11 @@
+kubernetes:
+  ingressClass: traefik
+  ingressClassResource:
+    name: traefik
+    enabled: true
+
+deployment:
+  replicas: 1
+
+service:
+  type: LoadBalancer
