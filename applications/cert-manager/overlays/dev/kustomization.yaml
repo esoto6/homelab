@@ -6,4 +6,4 @@ resources:
 
 patches:
   - patch: cluster-issuer-dev.yaml
-  - patch: certificates-dev.yaml
+  - patch: wildcard-certificate-dev.yaml
