@@ -19,9 +19,6 @@ spec:
           - name: trivy-operator
             namespace: trivy-system
             path: applications/trivy-operator/base
-          - name: rancher
-            namespace: cattle-system
-            path: applications/rancher/overlays/dev
           - name: nginx 
             path: applications/nginx/overlays/dev
             namespace: ngingx
