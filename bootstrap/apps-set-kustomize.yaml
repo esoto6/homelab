@@ -16,6 +16,9 @@ spec:
           - name: cert-manager
             path: applications/cert-manager/overlays/dev
             namespace: cert-manager
+          - name: trivy-operator
+            namespace: trivy-system
+            path: applications/trivy-operator/base
           - name: nginx 
             path: applications/nginx/overlays/dev
             namespace: ngingx
