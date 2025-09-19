@@ -25,6 +25,9 @@ spec:
           - name: nginx 
             path: applications/nginx/overlays/dev
             namespace: ngingx
+          - name: rancher
+            path: applications/rancher/overlays/dev
+            namespace: cattle-system
   template:
     metadata:
       name: '{{name}}'

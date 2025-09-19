@@ -1,0 +1,17 @@
+hostname: rancher.rubberduckops.com
+
+
+ingress:
+  ingressClassName: traefik
+  tls:
+    source: secret
+    secretName: rancher-tls
+replicas: 1
+bootstrapPassword: ""
+extraEnv:
+  - name: "CATTLE_BOOTSTRAP_PASSWORD"
+    valueFrom:
+      secretKeyRef:
+        name: rancher-bootstrap
+        key: bootstrapPassword
+
