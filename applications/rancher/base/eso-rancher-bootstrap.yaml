@@ -6,12 +6,12 @@ metadata:
 spec:
   refreshInterval: 1h
   secretStoreRef:
-    name: bitwarden-secretsmanager
+    name: bitwarden-cluster-secretstore
     kind: ClusterSecretStore
   target:
-    name: rancher-bootstrap
+    name: rancher-admin
     creationPolicy: Owner
   data:
     - secretKey: bootstrapPassword
       remoteRef:
-        key: "rancher-bootstrap"
+        key: "rancher-admin"
