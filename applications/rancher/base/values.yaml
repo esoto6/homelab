@@ -12,6 +12,6 @@ extraEnv:
   - name: "CATTLE_BOOTSTRAP_PASSWORD"
     valueFrom:
       secretKeyRef:
-        name: rancher-bootstrap
+        name: rancher-admin
         key: bootstrapPassword
 
