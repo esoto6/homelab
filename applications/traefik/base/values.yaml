@@ -9,3 +9,15 @@ deployment:
 
 service:
   type: LoadBalancer
+
+dashboard:
+  enabled: true
+  domain: traefik.rubberduckops.com
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    entryPoints: ["websecure"]
+    matchRule: "Host(`traefik.rubberduckops.com`)"
+    tls:
+      secretName: wildcard-cert-tls
