@@ -1,0 +1,15 @@
+---
+- name: Reset Cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    metallb_state: absent
+    cert_manager_state: absent
+
+  tasks:
+    - name: Uninstall MetalLB
+      import_tasks: tasks/metallb.yaml
+    - name: Uninstall Cert-Manager
+      import_tasks: tasks/cert-manager.yaml

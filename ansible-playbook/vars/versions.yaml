@@ -1,0 +1,22 @@
+metallb:
+  chart: metallb/metallb
+  version: 0.15.2
+
+cert_manager:
+  chart: jetstack/cert-manager
+  version: v1.18.2
+
+external_secrets:
+  chart: external-secrets/external-secrets
+  version: 0.19.2
+
+
+traefik:
+  chart: traefik/traefik
+  version: 37.1.1
+
+argocd:
+  chart: argo/argo-cd
+  version: 8.3.8
+
+
