@@ -10,7 +10,6 @@ external_secrets:
   chart: external-secrets/external-secrets
   version: 0.19.2
 
-
 traefik:
   chart: traefik/traefik
   version: 37.1.1

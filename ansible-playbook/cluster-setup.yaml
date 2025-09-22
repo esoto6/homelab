@@ -15,8 +15,8 @@
     - name: Install Cert-Manager
       import_tasks: tasks/cert-manager.yaml
 
-    # - name: Setup External Secrets
-    #   import_tasks: tasks/external-secrets.yaml
+    - name: Setup External Secrets
+      import_tasks: tasks/external-secrets.yaml
 
     # - name: Install Traefik
     #   import_tasks: tasks/traefik.yaml

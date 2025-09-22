@@ -3,12 +3,14 @@
   ansible.builtin.command:
     cmd: helm repo add jetstack https://charts.jetstack.io
   register: helm_repo_add
-  changed_when: "'already exists' not in result.stderr"
+  changed_when: "'already exists' not in helm_repo_add.stdout"
   ignore_errors: true
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
 
 - name: Update Helm repos
   ansible.builtin.command: 
     cmd: helm repo update
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
 
 - name: Ensure Cert-Manager namespace exists
   ansible.builtin.copy:
@@ -18,6 +20,7 @@
       kind: Namespace
       metadata:
         name: cert-manager
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
 
 - name: Apply Cert-Manager namespace
   kubernetes.core.k8s:
@@ -111,8 +114,8 @@
   when: cert_manager_state is not defined or cert_manager_state == 'present'
 
 - name: Wait for ClusterIssuer to be ready
-  ansible.builtin.command:
-    cmd: kubectl get clusterissuer/letsencrypt-stg -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+  ansible.builtin.shell: |
+    kubectl get clusterissuer/letsencrypt-stg -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | tr -d '[:space:]'
   register: clusterissuer_ready
   retries: 10
   delay: 15
@@ -146,12 +149,12 @@
   when: cert_manager_state is not defined or cert_manager_state == 'present'
 
 - name: Wait for Wildcard Certificate to be ready
-  ansible.builtin.command:
-    cmd: kubectl get certificate/wildcard-cert -n cert-manager -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+  ansible.builtin.shell: |
+    kubectl get certificate/wildcard-cert -n cert-manager -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | tr -d '[:space:]'
   register: wildcard_cert_ready
   retries: 20
   delay: 30
   until: wildcard_cert_ready.stdout == "True"
-  failed_when: wildcard_cert_read.stdout != "True"
+  failed_when: wildcard_cert_ready.stdout != "True"
   when: cert_manager_state is not defined or cert_manager_state == 'present'
 
