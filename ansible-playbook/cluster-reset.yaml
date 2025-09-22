@@ -8,6 +8,8 @@
     metallb_state: absent
     cert_manager_state: absent
     external_secrets_state: absent
+    traefik_state: absent
+    argocd_state: absent
 
   tasks:
     - name: Uninstall MetalLB
@@ -16,3 +18,7 @@
       import_tasks: tasks/cert-manager.yaml
     - name: Uninstall external-secrets
       import_tasks: tasks/external-secrets.yaml
+    - name: Uninstall Traefik
+      import_tasks: tasks/traefik_app.yaml
+    - name: Uninstall ArgoCD
+      import_tasks: tasks/argocd.yaml

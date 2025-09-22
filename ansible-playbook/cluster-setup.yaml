@@ -18,12 +18,9 @@
     - name: Setup External Secrets
       import_tasks: tasks/external-secrets.yaml
 
-    # - name: Install Traefik
-    #   import_tasks: tasks/traefik.yaml
-
-    # - name: Run validation checks
-    #   import_tasks: tasks/checks.yaml
+    - name: Install Traefik
+      import_tasks: tasks/traefik_app.yaml
     
-    # - name: Install ArgoCD
-    #   import_tasks: tasks/argocd.yaml
+    - name: Install ArgoCD
+      import_tasks: tasks/argocd.yaml
 
