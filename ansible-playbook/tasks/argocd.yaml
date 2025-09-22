@@ -88,6 +88,25 @@
     src: /tmp/argocd-ingress.yaml
   when: argocd_state is not defined or argocd_state == 'present'
 
+- name: Create argocd config map configs.cm.kustomize.buildOptions
+  ansible.builtin.copy:
+    dest: /tmp/argocd-kustomize-build-options.yaml
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-cm
+        namespace: argocd
+      data:
+        kustomize.buildOptions: --enable-helm
+  when: argocd_state is not defined or argocd_state == 'present'
+
+- name: Apply argocd config map configs.cm.kustomize.buildOptions
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/argocd-kustomize-build-options.yaml
+  when: argocd_state is not defined or argocd_state == 'present'
+  
 - name: Wait for ArgoCD server deployment to be ready
   ansible.builtin.command:
     cmd: kubectl rollout status deployment/argocd-server -n argocd --timeout=180s
