@@ -1,0 +1,35 @@
+---
+metallb:
+  namespace: metallb-system
+  chart: metallb/metallb
+  version: 0.15.2
+  repository_alias: metallb
+  repo: "https://metallb.github.io/metallb"
+
+cert_manager:
+  namespace: cert-manager
+  chart: jetstack/cert-manager
+  version: v1.18.2
+  repository_alias: jetstack
+  repo: "https://charts.jetstack.io"
+
+external_secrets:
+  namespace: external-secrets-system
+  chart: external-secrets/external-secrets
+  version: 0.19.2
+  repository_alias: external-secrets
+  repo: "https://charts.external-secrets.io"
+
+traefik:
+  namespace: traefik
+  chart: traefik/traefik
+  version: 37.1.0
+  repository_alias: traefik
+  repo: "https://traefik.github.io/charts"
+
+argocd:
+  namespace: argocd
+  chart: argo/argo-cd
+  version: 8.3.8
+  repository_alias: argo
+  repo: "https://argoproj.github.io/argo-helm"

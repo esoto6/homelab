@@ -1,0 +1,91 @@
+
+- name: Add MetalLB Helm repo
+  kubernetes.core.helm_repository:
+    name: "{{  metallb_alias }}"
+    repo_url: "{{ metallb_repo }}"
+
+- block:
+    - name: Ensure MetalLB namespace exists
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ metallb_namespace }}"
+            labels:
+              kubernetes.io/metadata.name: "{{ metallb_namespace }}"
+              pod-security.kubernetes.io/audit: privileged
+              pod-security.kubernetes.io/enforce: privileged
+              pod-security.kubernetes.io/enforce-version: latest
+              pod-security.kubernetes.io/warn: privileged
+
+    - name: Install or upgrade MetalLB via Helm
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: metallb
+        chart_ref: "{{ metallb_chart }}"
+        chart_version: "{{ metallb_version }}"
+        release_namespace: "{{ metallb_namespace }}"
+        create_namespace: true
+        state: present
+
+    - name: Apply MetalLB IPAddressPool
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          metadata:
+            name: default-address-pool
+            namespace: "{{ metallb_namespace }}"
+          spec:
+            addresses:
+              - "{{ metallb_addresses }}"
+
+    - name: Apply MetalLB L2Advertisement
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          metadata:
+            name: default-l2-advertisement
+            namespace: "{{ metallb_namespace }}"
+
+  when: metallb_state == 'present'
+
+# -------------------
+# UNINSTALL BLOCK
+# -------------------
+- block:
+    - name: Uninstall MetalLB release
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        name: metallb
+        release_namespace: "{{ metallb_namespace }}"
+        state: absent
+
+    - name: Delete MetalLB namespace
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: absent
+        kind: Namespace
+        name: "{{ metallb_namespace }}"
+
+    - name: Delete MetalLB CRDs
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: absent
+        kind: CustomResourceDefinition
+        name: "{{ item }}"
+      loop:
+        - ipaddresspools.metallb.io
+        - l2advertisements.metallb.io
+        - bgppeers.metallb.io
+        - bgpadvertisements.metallb.io
+
+  when: metallb_state == 'absent'

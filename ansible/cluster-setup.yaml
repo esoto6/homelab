@@ -1,0 +1,40 @@
+---
+- name: Setup Kubernetes Cluster Components
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars/app-secrets.yaml
+    - vars/app-versions.yaml
+
+  vars: 
+    metallb_state: present
+    cert_manager_state: present
+    external_secrets_state: present
+    traefik_state: present
+    argocd_state: present
+
+  tasks:
+    - import_tasks: tasks/1.metallb-app.yaml
+      vars:
+        kubeconfig_path: "~/.kube/config"
+        metallb_namespace: "{{ metallb.namespace }}"
+        metallb_chart: "{{ metallb.chart }}"
+        metallb_version: "{{ metallb.version }}"
+        metallb_repo: "{{ metallb.repo }}"
+        metallb_alias: "{{ metallb.repository_alias }}"
+        metallb_addresses: "{{ ip_addresses }}"
+
+    # - name: Install Cert-Manager
+    #   import_tasks: tasks/cert-manager.yaml
+
+    # - name: Setup External Secrets
+    #   import_tasks: tasks/external-secrets.yaml
+
+    # - name: Install Traefik
+    #   import_tasks: tasks/traefik_app.yaml
+    
+    # - name: Install ArgoCD
+    #   import_tasks: tasks/argocd.yaml
+

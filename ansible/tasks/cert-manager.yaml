@@ -1,0 +1,160 @@
+---
+- name: Add Jetstack Helm repo
+  ansible.builtin.command:
+    cmd: helm repo add jetstack https://charts.jetstack.io
+  register: helm_repo_add
+  changed_when: "'already exists' not in helm_repo_add.stdout"
+  ignore_errors: true
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Update Helm repos
+  ansible.builtin.command: 
+    cmd: helm repo update
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Ensure Cert-Manager namespace exists
+  ansible.builtin.copy:
+    dest: /tmp/cert-manager-namespace.yaml
+    content: |
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: cert-manager
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Apply Cert-Manager namespace
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/cert-manager-namespace.yaml
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Uninstall Cert-Manager if requested
+  ansible.builtin.command: 
+    cmd: helm uninstall cert-manager -n cert-manager
+  when: cert_manager_state is defined and cert_manager_state == 'absent'
+  ignore_errors: true
+
+- name: Delete Cert-Manager namespace if requested
+  ansible.builtin.command:
+    cmd: kubectl delete namespace cert-manager
+  when: cert_manager_state is defined and cert_manager_state == 'absent'
+  ignore_errors: true
+
+- name: Remove cert-manager namespace finalizers
+  ansible.builtin.command: >
+    kubectl get namespace cert-manager -o json | 
+    jq 'del(.spec.finalizers)' |
+    kubectl replace --raw "/api/v1/namespaces/cert-manager/finalize" -f -
+  ignore_errors: true
+  when: cert_manager_state is defined and cert_manager_state == 'absent'
+
+- name: Install Cert-Manager
+  ansible.builtin.command: 
+    cmd: >
+      helm install cert-manager jetstack/cert-manager
+      --namespace cert-manager
+      --create-namespace
+      --version {{ cert_manager.version }}
+      --set crds.enabled=true
+  register: cert_manager_install
+  ignore_errors: true
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Wait for Cert-Manager pods to be ready
+  ansible.builtin.command:
+    cmd: kubectl get pods -n cert-manager
+  register: cert_manager_pods
+  retries: 10
+  delay: 15
+  until: cert_manager_pods.stdout != ""
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Wait for cert-manager pods to be ready
+  ansible.builtin.command:
+    cmd: kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=600s
+  register: cert_manager_ready
+  failed_when: cert_manager_ready.rc != 0 
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Create Cloudflare API token secret
+  ansible.builtin.command: >
+    kubectl create secret generic cloudflare-api-token
+    --from-literal=api-token={{ cloudflare_api_token }}
+    -n cert-manager
+  ignore_errors: true
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Create ClusterIssuer
+  ansible.builtin.copy:
+    dest: /tmp/clusterissuer.yaml
+    content: |
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: letsencrypt-stg
+      spec:
+        acme:
+          email: "{{ email }}"
+          server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+          privateKeySecretRef:
+            name: cloudflare-key
+          solvers:
+            - dns01:
+                cloudflare:
+                  email: "{{ email }}"
+                  apiTokenSecretRef:
+                    name: cloudflare-api-token
+                    key: api-token
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Apply ClusterIssuer
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/clusterissuer.yaml
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Wait for ClusterIssuer to be ready
+  ansible.builtin.shell: |
+    kubectl get clusterissuer/letsencrypt-stg -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | tr -d '[:space:]'
+  register: clusterissuer_ready
+  retries: 10
+  delay: 15
+  until: clusterissuer_ready.stdout == "True"
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Apply Wildcard Certificate
+  ansible.builtin.copy:
+    dest: /tmp/wildcard-cert.yaml
+    content: |
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: wildcard-cert
+        namespace: cert-manager
+      spec:
+        secretName: wildcard-cert-tls
+        issuerRef:
+          name: letsencrypt-stg
+          kind: ClusterIssuer
+        commonName: "*.{{ domain }}"
+        dnsNames:
+          - "*.{{ domain }}"
+          - "{{ domain }}"
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Apply Wildcard Certificate
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/wildcard-cert.yaml
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+
+- name: Wait for Wildcard Certificate to be ready
+  ansible.builtin.shell: |
+    kubectl get certificate/wildcard-cert -n cert-manager -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | tr -d '[:space:]'
+  register: wildcard_cert_ready
+  retries: 20
+  delay: 30
+  until: wildcard_cert_ready.stdout == "True"
+  failed_when: wildcard_cert_ready.stdout != "True"
+  when: cert_manager_state is not defined or cert_manager_state == 'present'
+

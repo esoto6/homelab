@@ -1,0 +1,80 @@
+---
+- name: Add Traefik Helm repo
+  ansible.builtin.command: >
+    helm repo add traefik https://traefik.github.io/charts
+  ignore_errors: true
+  register: helm_repo_add
+  changed_when: "'already exists' not in helm_repo_add.stdout"
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- name: Update Helm repos
+  ansible.builtin.command:
+    cmd: helm repo update
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- name: Ensure traefik namespace exists
+  ansible.builtin.copy:
+    dest: /tmp/traefik-namespace.yaml
+    content: |
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: traefik
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- name: Apply traefik namespace
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/traefik-namespace.yaml
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- name: Install Traefik via Helm
+  ansible.builtin.command: >
+    helm upgrade --install traefik traefik/traefik
+    --namespace traefik
+    --create-namespace
+    --version {{ traefik.version }}
+    --set crds.enabled=true
+    --set kubernetes.ingressClass=traefik
+    --set kubernetes.ingressClassResource.name=traefik
+    --set kubernetes.ingressClassResource.enabled=true
+    --set deployment.replicas=1
+    --set service.type=LoadBalancer
+    --set dashboard.enabled=true
+    --set dashboard.domain=traefik.rubberduckops.com
+    --set ingressRoute.dashboard.enabled=true
+    --set ingressRoute.dashboard.entryPoints[0]=websecure
+    --set 'ingressRoute.dashboard.matchRule=Host(`traefik.rubberduckops.com`)'
+    --set ingressRoute.dashboard.tls.secretName=wildcard-cert-tls
+  register: traefik_install
+  when: traefik_state is not defined or traefik_state == 'present'
+
+
+- name: Wait for Traefik deployment to be ready
+  ansible.builtin.command:
+    cmd: kubectl rollout status deployment/traefik -n traefik --timeout=120s
+  register: traefik_ready
+  retries: 10
+  delay: 15
+  until: traefik_ready.rc == 0
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- name: Uninstall Traefik
+  ansible.builtin.command: >
+    helm uninstall traefik -n traefik
+  ignore_errors: true
+  when: traefik_state is defined and traefik_state == 'absent'
+
+- name: Delete traefik namespace
+  ansible.builtin.command: >
+    kubectl delete namespace traefik
+  ignore_errors: true
+  when: traefik_state is defined and traefik_state == 'absent'
+
+- name: Remove finalizers from namespace (if stuck)
+  ansible.builtin.command: >
+    kubectl get namespace traefik -o json |
+    jq 'del(.spec.finalizers)' |
+    kubectl replace --raw "/api/v1/namespaces/traefik/finalize" -f -
+  ignore_errors: true
+  when: traefik_state is defined and traefik_state == 'absent'
