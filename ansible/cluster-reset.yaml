@@ -26,8 +26,17 @@
         metallb_alias: "{{ metallb.repository_alias }}"
         metallb_addresses: "{{ ip_addresses }}"
 
-    # - name: Uninstall Cert-Manager
-    #   import_tasks: tasks/cert-manager.yaml
+    - import_tasks: tasks/2.cert-manager-app.yaml
+      vars: 
+          kubeconfig_path: "~/.kube/config"
+          cert_manager_namespace: "{{ cert_manager.namespace }}"
+          cert_manager_chart: "{{ cert_manager.chart }}"
+          cert_manager_version: "{{ cert_manager.version }}"
+          cert_manager_repo: "{{ cert_manager.repo }}"
+          cert_manager_alias: "{{ cert_manager.repository_alias }}"
+          domain_email: "{{ cert_manager_domain_email }}"
+          domain_name: "{{ cert_maanger_domain_name }}"
+          domain_token: "{{ cloudflare_token }}"
     # - name: Uninstall external-secrets
     #   import_tasks: tasks/external-secrets.yaml
     # - name: Uninstall Traefik

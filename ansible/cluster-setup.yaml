@@ -16,7 +16,8 @@
     argocd_state: present
 
   tasks:
-    - import_tasks: tasks/1.metallb-app.yaml
+    - name: Install MetalLB
+      import_tasks: tasks/1.metallb-app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         metallb_namespace: "{{ metallb.namespace }}"
@@ -26,8 +27,18 @@
         metallb_alias: "{{ metallb.repository_alias }}"
         metallb_addresses: "{{ ip_addresses }}"
 
-    # - name: Install Cert-Manager
-    #   import_tasks: tasks/cert-manager.yaml
+    - name: Install Cert-Manager
+      import_tasks: tasks/2.cert-manager-app.yaml
+      vars: 
+        kubeconfig_path: "~/.kube/config"
+        cert_manager_namespace: "{{ cert_manager.namespace }}"
+        cert_manager_chart: "{{ cert_manager.chart }}"
+        cert_manager_version: "{{ cert_manager.version }}"
+        cert_manager_repo: "{{ cert_manager.repo }}"
+        cert_manager_alias: "{{ cert_manager.repository_alias }}"
+        domain_email: "{{ cert_manager_domain_email }}"
+        domain_name: "{{ cert_manager_domain_name }}"
+        domain_token: "{{ cloudflare_token }}"
 
     # - name: Setup External Secrets
     #   import_tasks: tasks/external-secrets.yaml

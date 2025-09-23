@@ -31,6 +31,35 @@
         create_namespace: true
         state: present
 
+    - name: Wait for MetalLB pods to be ready
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Pod
+        namespace: "{{ metallb_namespace }}"
+      register: metallb_pods
+      until: metallb_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+      retries: 30
+      delay: 10
+
+    - name: Wait for all MetalLB Speaker pods to be running and ready
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Pod
+        namespace: "{{ metallb_namespace }}"
+        label_selectors:
+          - app=metallb-speaker
+      register: metallb_speaker_pods
+      until: >
+        metallb_speaker_pods.resources
+        | selectattr('status.phase', 'equalto', 'Running')
+        | selectattr('status.containerStatuses', 'defined')
+        | selectattr('status.containerStatuses', 'all',
+            attribute='ready')
+        | list | length == metallb_speaker_pods.resources | length
+      retries: 30
+      delay: 10
+
+      
     - name: Apply MetalLB IPAddressPool
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -58,9 +87,6 @@
 
   when: metallb_state == 'present'
 
-# -------------------
-# UNINSTALL BLOCK
-# -------------------
 - block:
     - name: Uninstall MetalLB release
       kubernetes.core.helm:
