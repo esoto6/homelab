@@ -8,25 +8,25 @@ spec:
     - list:
         elements:
           - name: argocd
-            path: applications/argocd/overlays/dev
+            path: kubernetes/applications/argocd/overlays/dev
             namespace: argocd
           - name: external-secrets
-            path: applications/external-secrets/base
+            path: kubernetes/applications/external-secrets/base
             namespace: external-secrets-system
           - name: traefik
-            path: applications/traefik/base
+            path: kubernetes/applications/traefik/base
             namespace: traefik
           - name: cert-manager
-            path: applications/cert-manager/overlays/dev
+            path: kubernetes/applications/cert-manager/overlays/dev
             namespace: cert-manager
           - name: trivy-operator
             namespace: trivy-system
-            path: applications/trivy-operator/base
+            path: kubernetes/applications/trivy-operator/base
           - name: nginx 
-            path: applications/nginx/overlays/dev
+            path: kubernetes/applications/nginx/overlays/dev
             namespace: ngingx
           # - name: rancher
-          #   path: applications/rancher/overlays/dev
+          #   path: kubernetes/applications/rancher/overlays/dev
           #   namespace: cattle-system
   template:
     metadata:

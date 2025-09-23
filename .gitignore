@@ -66,3 +66,4 @@ values2.yaml
 metallb-system.yaml
 
 secrets.yaml
+app-secrets.yaml
