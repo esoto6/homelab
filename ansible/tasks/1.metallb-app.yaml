@@ -58,7 +58,15 @@
         | list | length == metallb_speaker_pods.resources | length
       retries: 30
       delay: 10
-
+      
+    - name: Wait for MetalLB CRDs to be ready
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        kubeconfig: "{{ kubeconfig_path }}"
+      register: metallb_crds
+      until: "'ipaddresspools.metallb.io' in metallb_crds.resources | map(attribute='metadata.name') | list"
+      retries: 15
+      delay: 10
       
     - name: Apply MetalLB IPAddressPool
       kubernetes.core.k8s:

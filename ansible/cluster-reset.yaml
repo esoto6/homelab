@@ -16,27 +16,27 @@
     argocd_state: absent
 
   tasks:
-    # - import_tasks: tasks/1.metallb-app.yaml
-    #   vars:
-    #     kubeconfig_path: "~/.kube/config"
-    #     metallb_namespace: "{{ metallb.namespace }}"
-    #     metallb_chart: "{{ metallb.chart }}"
-    #     metallb_version: "{{ metallb.version }}"
-    #     metallb_repo: "{{ metallb.repo }}"
-    #     metallb_alias: "{{ metallb.repository_alias }}"
-    #     metallb_addresses: "{{ ip_addresses }}"
+    - import_tasks: tasks/1.metallb-app.yaml
+      vars:
+        kubeconfig_path: "~/.kube/config"
+        metallb_namespace: "{{ metallb.namespace }}"
+        metallb_chart: "{{ metallb.chart }}"
+        metallb_version: "{{ metallb.version }}"
+        metallb_repo: "{{ metallb.repo }}"
+        metallb_alias: "{{ metallb.repository_alias }}"
+        metallb_addresses: "{{ ip_addresses }}"
 
-    # - import_tasks: tasks/2.cert-manager-app.yaml
-    #   vars: 
-    #       kubeconfig_path: "~/.kube/config"
-    #       cert_manager_namespace: "{{ cert_manager.namespace }}"
-    #       cert_manager_chart: "{{ cert_manager.chart }}"
-    #       cert_manager_version: "{{ cert_manager.version }}"
-    #       cert_manager_repo: "{{ cert_manager.repo }}"
-    #       cert_manager_alias: "{{ cert_manager.repository_alias }}"
-    #       domain_email: "{{ cert_manager_domain_email }}"
-    #       domain_name: "{{ cert_manager_domain_name }}"
-    #       domain_token: "{{ cloudflare_token }}"
+    - import_tasks: tasks/2.cert-manager-app.yaml
+      vars: 
+          kubeconfig_path: "~/.kube/config"
+          cert_manager_namespace: "{{ cert_manager.namespace }}"
+          cert_manager_chart: "{{ cert_manager.chart }}"
+          cert_manager_version: "{{ cert_manager.version }}"
+          cert_manager_repo: "{{ cert_manager.repo }}"
+          cert_manager_alias: "{{ cert_manager.repository_alias }}"
+          domain_email: "{{ cert_manager_domain_email }}"
+          domain_name: "{{ cert_manager_domain_name }}"
+          domain_token: "{{ cloudflare_token }}"
           
     - name: Uninstall external-secrets
       import_tasks: tasks/3.external-secrets-app.yaml
@@ -50,8 +50,17 @@
         eso_bitwarden_token: "{{ bitwarden_access_token }}"
         eso_bitwarden_org_id: "{{ bitwarden_organization_id }}"
         eso_bitwarden_project_id: "{{ bitwarden_project_id }}"
-        
-    # - name: Uninstall Traefik
-    #   import_tasks: tasks/traefik_app.yaml
+
+    - name: Uninstall Traefik
+      import_tasks: tasks/3.traefik_app.yaml
+      vars:
+        kubeconfig_path: "~/.kube/config"
+        traefik_namespace: "{{ traefik.namespace }}"
+        traefik_chart: "{{ traefik.chart }}"
+        traefik_version: "{{ traefik.version }}"
+        traefik_repo: "{{ traefik.repo }}"
+        traefik_alias: "{{ traefik.repository_alias }}"
+        traefik_domain: "traeffik.{{ cert_manager_domain_name }}"
+
     # - name: Uninstall ArgoCD
     #   import_tasks: tasks/argocd.yaml

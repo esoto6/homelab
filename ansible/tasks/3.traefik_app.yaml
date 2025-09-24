@@ -1,0 +1,142 @@
+---
+- name: Add Traefik Helm repo
+  kubernetes.core.helm_repository:
+    name: "{{ traefik_alias }}"
+    repo_url: "{{ traefik_repo }}"
+
+- block:
+    - name: Ensure traefik namespace exists
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ traefik_namespace }}"
+
+    - name: Get wildcard cert from source namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Secret
+        namespace: cert-manager
+        name: wildcard-cert-tls
+      register: source_cert
+
+    - name: Apply wildcard cert to Traefik namespace
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: wildcard-cert-tls
+            namespace: "{{ traefik_namespace }}"
+          type: "{{ source_cert.resources[0].type }}"
+          data: "{{ source_cert.resources[0].data }}"
+
+    - name: Install Traefik via Helm
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        release_name: traefik
+        chart_ref: "{{ traefik_chart }}"
+        namespace: "{{ traefik_namespace }}"
+        create_namespace: true
+        chart_version: "{{ traefik_version }}"
+        wait: true
+        values:
+          crds:
+            enabled: true
+          kubernetes:
+            ingressClass: traefik
+            ingressClassResource:
+              name: traefik
+              enabled: true
+          deployment:
+            replicas: 1
+          service:
+            type: LoadBalancer
+          dashboard:
+            enabled: true
+            domain: "{{ traefik_domain }}"
+          ingressRoute:
+            dashboard:
+              enabled: true
+              entryPoints:
+                - websecure
+              matchRule: "Host(`{{ traefik_domain }}`)"
+              tls:
+                secretName: wildcard-cert-tls
+
+    - name: Wait for Traefik deployment to be ready
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Deployment
+        namespace: "{{ traefik_namespace }}"
+        name: traefik
+      register: traefik_deploy
+      until: traefik_deploy.resources[0].status.readyReplicas == traefik_deploy.resources[0].status.replicas
+      retries: 20
+      delay: 15
+
+  when: traefik_state is not defined or traefik_state == 'present'
+
+- block:
+    - name: Delete Traefik ClusterRoles
+      ansible.builtin.command: >
+        kubectl delete clusterrole traefik-traefik traefik-traefik-webhook traefik-traefik-dashboard
+      ignore_errors: true
+
+    - name: Delete Traefik ClusterRoleBindings
+      ansible.builtin.command: >
+        kubectl delete clusterrolebinding traefik-traefik traefik-traefik-webhook traefik-traefik-dashboard
+      ignore_errors: true
+
+    - name: Delete Traefik ValidatingWebhookConfigurations
+      ansible.builtin.command: >
+        kubectl get validatingwebhookconfigurations -o name | grep traefik | xargs -r kubectl delete
+      ignore_errors: true
+
+    - name: Delete Traefik MutatingWebhookConfigurations
+      ansible.builtin.command: >
+        kubectl get mutatingwebhookconfigurations -o name | grep traefik | xargs -r kubectl delete
+      ignore_errors: true
+    
+    - name: Delete Traefik CRDs
+      ansible.builtin.command: kubectl delete {{ item }}
+      loop: "{{ crds_list.stdout_lines | select('match', 'traefik|hub.traefik.io|gateway.networking.k8s.io') | list }}"
+      ignore_errors: true
+
+    - name: Delete Traefik IngressClasses
+      ansible.builtin.command: >
+        kubectl delete ingressclass traefik
+      ignore_errors: true
+
+    - name: Uninstall Traefik
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        release_name: traefik
+        namespace: "{{ traefik_namespace }}"
+        release_state: absent
+      ignore_errors: true
+
+    - name: Delete traefik namespace
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: absent
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ traefik_namespace }}"
+      ignore_errors: true
+
+    - name: Remove finalizers from namespace (if stuck)
+      ansible.builtin.command: >
+        kubectl get namespace {{ traefik_namespace }} -o json |
+        jq 'del(.spec.finalizers)' |
+        kubectl replace --raw "/api/v1/namespaces/{{ traefik_namespace }}/finalize" -f -
+      ignore_errors: true
+
+  when: traefik_state is defined and traefik_state == 'absent'
