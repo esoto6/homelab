@@ -41,20 +41,6 @@
           stringData:
             api-token: "{{ domain_token }}"
 
-    - name: Create Cloudflare API token secret  
-      kubernetes.core.k8s:
-        kubeconfig: "{{ kubeconfig_path }}"
-        state: present
-        definition:
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: cloudflare-api-token
-            namespace: "{{ cert_manager_namespace }}"
-          type: Opaque
-          stringData:
-            api-token: "{{ domain_token }}"
-
     - name: Apply ClusterIssuer
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -69,7 +55,7 @@
               email: "{{ domain_email }}"
               server: "https://acme-staging-v02.api.letsencrypt.org/directory"
               privateKeySecretRef:
-                name: cloudflare-key
+                name: cloudflare-token
               solvers:
                 - dns01:
                     cloudflare:
@@ -103,19 +89,23 @@
         kubeconfig: "{{ kubeconfig_path }}"
         kind: Certificate
         namespace: "{{ cert_manager_namespace }}"
-        name: "wildcard-cert"  
+        name: "wildcard-cert"
       register: wildcard_cert_status
       until: >
-        wildcard_cert_status.resources
-        | selectattr('status.conditions', 'defined')
-        | selectattr('status.conditions', 'selectattr("type","equalto","Ready")')
-        | selectattr('status.conditions', 'selectattr("status","equalto","True")')
-        | list
-        | length > 0
+        (
+          wildcard_cert_status.resources | length > 0
+        ) and (
+          (
+            wildcard_cert_status.resources[0].status.conditions
+            | selectattr('type', 'equalto', 'Ready')
+            | selectattr('status', 'equalto', 'True')
+            | list
+          ) | length > 0
+        )
       retries: 60
       delay: 10
-      failed_when: wildcard_cert_status.resources | length == 0
-      when: cert_manager_state == 'present'
+      
+  when: cert_manager_state == 'present'
 
     
 - block:
@@ -151,6 +141,17 @@
       loop: "{{ acme_challenges.resources }}"
       ignore_errors: true
 
+    - name: Delete cert-manager resources if CRD exists
+      shell: |
+        for crd in issuers.cert-manager.io clusterissuers.cert-manager.io certificates.cert-manager.io certificaterequests.cert-manager.io orders.acme.cert-manager.io challenges.acme.cert-manager.io; do
+          if kubectl get crd $crd >/dev/null 2>&1; then
+            kubectl delete --all --all-namespaces --ignore-not-found ${crd%%.*}
+          fi
+        done
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
     - name: Find namespaces with ACME Orders
       kubernetes.core.k8s_info:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -166,26 +167,6 @@
         api_version: acme.cert-manager.io/v1
         namespace: "{{ item.metadata.namespace }}"
       loop: "{{ acme_orders.resources }}"
-      ignore_errors: true
-
-    - name: Remove finalizers from ACME Challenges (if stuck)
-      ansible.builtin.shell: |
-        for ns in $(kubectl get ns --no-headers -o custom-columns=":metadata.name"); do
-          for cr in $(kubectl get challenges.acme.cert-manager.io -n $ns --no-headers -o custom-columns=":metadata.name"); do
-            kubectl patch challenge $cr -n $ns -p '{"metadata":{"finalizers":[]}}' --type=merge
-          done
-        done
-      changed_when: false
-      ignore_errors: true
-
-    - name: Remove finalizers from ACME Orders (if stuck)
-      ansible.builtin.shell: |
-        for ns in $(kubectl get ns --no-headers -o custom-columns=":metadata.name"); do
-          for cr in $(kubectl get orders.acme.cert-manager.io -n $ns --no-headers -o custom-columns=":metadata.name"); do
-            kubectl patch order $cr -n $ns -p '{"metadata":{"finalizers":[]}}' --type=merge
-          done
-        done
-      changed_when: false
       ignore_errors: true
 
     - name: Remove Cert-Manager CRD finalizers if stuck
@@ -206,7 +187,6 @@
       changed_when: false
       ignore_errors: true
     
-
     - name: Delete Cert-Manager CRDs
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"

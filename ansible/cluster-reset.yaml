@@ -35,8 +35,9 @@
           cert_manager_repo: "{{ cert_manager.repo }}"
           cert_manager_alias: "{{ cert_manager.repository_alias }}"
           domain_email: "{{ cert_manager_domain_email }}"
-          domain_name: "{{ cert_maanger_domain_name }}"
+          domain_name: "{{ cert_manager_domain_name }}"
           domain_token: "{{ cloudflare_token }}"
+          
     # - name: Uninstall external-secrets
     #   import_tasks: tasks/external-secrets.yaml
     # - name: Uninstall Traefik
