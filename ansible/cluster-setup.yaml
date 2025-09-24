@@ -40,8 +40,18 @@
         domain_name: "{{ cert_manager_domain_name }}"
         domain_token: "{{ cloudflare_token }}"
 
-    # - name: Setup External Secrets
-    #   import_tasks: tasks/external-secrets.yaml
+    - name: Setup External Secrets
+      import_tasks: tasks/3.external-secrets-app.yaml
+      vars:
+        kubeconfig_path: "~/.kube/config"
+        eso_namespace: "{{ external_secrets.namespace }}"
+        eso_chart: "{{ external_secrets.chart }}"
+        eso_version: "{{ external_secrets.version }}"
+        eso_repo: "{{ external_secrets.repo }}"
+        eso_alias: "{{ external_secrets.repository_alias }}"  
+        eso_bitwarden_token: "{{ bitwarden_access_token }}"
+        eso_bitwarden_org_id: "{{ bitwarden_organization_id }}"
+        eso_bitwarden_project_id: "{{ bitwarden_project_id }}"
 
     # - name: Install Traefik
     #   import_tasks: tasks/traefik_app.yaml
