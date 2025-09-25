@@ -1,4 +1,4 @@
-
+---
 - name: Add MetalLB Helm repo
   kubernetes.core.helm_repository:
     name: "{{  metallb_alias }}"
@@ -66,7 +66,7 @@
         | list | length == metallb_speaker_pods.resources | length
       retries: 40
       delay: 10
-     
+
     - name: Wait for MetalLB CRDs to be ready
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
@@ -75,11 +75,11 @@
       until: "'ipaddresspools.metallb.io' in metallb_crds.resources | map(attribute='metadata.name') | list"
       retries: 15
       delay: 10
-      
+
     - name: Wait a bit for MetalLB webhook to initialize
       ansible.builtin.pause:
         seconds: 15
-        
+
     - name: Apply MetalLB IPAddressPool
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"

@@ -4,7 +4,9 @@
     name: "{{ traefik_alias }}"
     repo_url: "{{ traefik_repo }}"
 
-- block:
+- when: traefik_state is not defined or traefik_state == 'present'
+
+  block:
     - name: Ensure traefik namespace exists
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -80,9 +82,8 @@
       retries: 20
       delay: 15
 
-  when: traefik_state is not defined or traefik_state == 'present'
-
-- block:
+- when: traefik_state is defined and traefik_state == 'absent'
+  block:
     - name: Delete Traefik ClusterRoles
       ansible.builtin.command: >
         kubectl delete clusterrole traefik-traefik traefik-traefik-webhook traefik-traefik-dashboard
@@ -102,7 +103,7 @@
       ansible.builtin.command: >
         kubectl get mutatingwebhookconfigurations -o name | grep traefik | xargs -r kubectl delete
       ignore_errors: true
-    
+
     - name: Delete Traefik CRDs
       ansible.builtin.command: kubectl delete {{ item }}
       loop: "{{ crds_list.stdout_lines | select('match', 'traefik|hub.traefik.io|gateway.networking.k8s.io') | list }}"
@@ -138,5 +139,3 @@
         jq 'del(.spec.finalizers)' |
         kubectl replace --raw "/api/v1/namespaces/{{ traefik_namespace }}/finalize" -f -
       ignore_errors: true
-
-  when: traefik_state is defined and traefik_state == 'absent'

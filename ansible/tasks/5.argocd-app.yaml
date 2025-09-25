@@ -1,10 +1,12 @@
---- 
+---
 - name: Add ArgoCD Helm repo
   kubernetes.core.helm_repository:
     name: "{{ argocd_alias }}"
     repo_url: "{{ argocd_repo }}"
 
-- block:
+- when: argocd_state is not defined or argocd_state == 'present'
+
+  block:
     - name: Ensure ArgoCD namespace exists
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -53,11 +55,6 @@
             target:
               name: argocd-admin-secret
               creationPolicy: Owner
-              # template:
-                # type: Opaque
-                # data:
-                #   admin.password: "{{ '{{ .argocd_password | bcrypt }}' }}"
-                #   admin.passwordMtime: "2024-01-01T00:00:00Z"
             data:
               - secretKey: argocd_password
                 remoteRef:
@@ -74,7 +71,6 @@
       until: argocd_admin_secret.resources | length > 0
       retries: 10
       delay: 15
-
 
     - name: Install ArgoCD via Helm
       kubernetes.core.helm:
@@ -97,9 +93,6 @@
           secret:
             createSecret: false
           server:
-            # adminSecret:
-            #   existingSecret: argocd-admin-secret
-            #   passwordKey: password
             ingress:
               enabled: false
             service:
@@ -138,8 +131,7 @@
             namespace: "{{ argocd_namespace }}"
           stringData:
             admin.password: "{{ argocd_bcrypt_password }}"
-            admin.passwordMtime: "{{ lookup('pipe','date +%FT%T%Z') }}"
-
+            admin.passwordMtime: "{{ lookup('pipe', 'date +%FT%T%Z') }}"
 
     - name: Apply ArgoCD IngressRoute for Traefik
       kubernetes.core.k8s:
@@ -183,10 +175,8 @@
       retries: 15
       delay: 20
 
-  when: argocd_state is not defined or argocd_state == 'present'
-
-
-- block:
+- when: argocd_state is defined and argocd_state == 'absent'
+  block:
     - name: Get all CRDs for ArgoCD
       ansible.builtin.command: >
         kubectl get crds -o name | grep argoproj.io
@@ -200,7 +190,7 @@
       loop: "{{ argocd_crds.stdout_lines | default([]) }}"
       when: argocd_crds.stdout != ""
       ignore_errors: true
-      
+
     - name: Uninstall ArgoCD Helm release
       kubernetes.core.helm:
         name: argocd
@@ -227,5 +217,3 @@
           spec:
             finalizers: []
             ignore_errors: true
-
-  when: argocd_state is defined and argocd_state == 'absent'

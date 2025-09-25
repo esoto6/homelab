@@ -8,7 +8,7 @@
     - vars/app-secrets.yaml
     - vars/app-versions.yaml
 
-  vars: 
+  vars:
     metallb_state: present
     cert_manager_state: present
     external_secrets_state: present
@@ -17,7 +17,7 @@
 
   tasks:
     - name: Install MetalLB
-      import_tasks: tasks/1.metallb-app.yaml
+      ansible.builtin.import_tasks: tasks/1.metallb-app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         metallb_namespace: "{{ metallb.namespace }}"
@@ -28,8 +28,8 @@
         metallb_addresses: "{{ ip_addresses }}"
 
     - name: Install Cert-Manager
-      import_tasks: tasks/2.cert-manager-app.yaml
-      vars: 
+      ansible.builtin.import_tasks: tasks/2.cert-manager-app.yaml
+      vars:
         kubeconfig_path: "~/.kube/config"
         cert_manager_namespace: "{{ cert_manager.namespace }}"
         cert_manager_chart: "{{ cert_manager.chart }}"
@@ -41,20 +41,20 @@
         domain_token: "{{ cloudflare_token }}"
 
     - name: Setup External Secrets
-      import_tasks: tasks/3.external-secrets-app.yaml
+      ansible.builtin.import_tasks: tasks/3.external-secrets-app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         eso_namespace: "{{ external_secrets.namespace }}"
         eso_chart: "{{ external_secrets.chart }}"
         eso_version: "{{ external_secrets.version }}"
         eso_repo: "{{ external_secrets.repo }}"
-        eso_alias: "{{ external_secrets.repository_alias }}"  
+        eso_alias: "{{ external_secrets.repository_alias }}"
         eso_bitwarden_token: "{{ bitwarden_access_token }}"
         eso_bitwarden_org_id: "{{ bitwarden_organization_id }}"
         eso_bitwarden_project_id: "{{ bitwarden_project_id }}"
 
     - name: Install Traefik
-      import_tasks: tasks/4.traefik_app.yaml
+      ansible.builtin.import_tasks: tasks/4.traefik_app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         traefik_namespace: "{{ traefik.namespace }}"
@@ -63,9 +63,9 @@
         traefik_repo: "{{ traefik.repo }}"
         traefik_alias: "{{ traefik.repository_alias }}"
         traefik_domain: "traefik.{{ cert_manager_domain_name }}"
-    
+
     - name: Install ArgoCD
-      import_tasks: tasks/5.argocd-app.yaml
+      ansible.builtin.import_tasks: tasks/5.argocd-app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         argocd_namespace: "{{ argocd.namespace }}"
@@ -75,4 +75,3 @@
         argocd_alias: "{{ argocd.repository_alias }}"
         argocd_domain: "argocd.{{ cert_manager_domain_name }}"
         argocd_admin_password: "{{ argocd_admin_password }}"
-

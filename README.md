@@ -19,21 +19,17 @@ The homelab runs on a dedicated machine with Proxmox as the hypervisor. The hard
 
 ### Steps
 
+#### K3s with Proxmox
+
 #### Terraform - Proxmox
 Utilizing this repo [terraform-proxmox](https://github.com/esoto6/terraform-proxmox) to configure vms on proxmox
 
-#### Ansible 
+#### Ansible Environment Setup
 Initially started using my own ansible steps to initiate k3s. Discovered this repo [k3s-ansible](https://github.com/timothystewart6/k3s-ansible) which I am utilizing to initiate k3s. 
 
-#### Intermediate step
+#### Ansible Pre Sync Configuration
 
-I need to figure out how to automate this step. Prep requirements in order for argocd install to go smoothly. 
-
-1. Need external secrets to pull secrets
-2. Once eso is configured need to install cert-manager to create certificates use dns01 challenge
-3. Once certificates are valid use traefik to create ingress routes for apps
-
-[Intermediate steps](INTERMEDIATE_STEPS.md)
+[Ansible Pre Sync](/ansible/README.md)
 
 Once argocd is installed bootstrap cluster
 

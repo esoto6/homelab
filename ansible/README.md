@@ -6,9 +6,9 @@ cloudflare_api_token: "<token>"
 bitwarden_access_token: "<token>"
 bitwarden_organization_id: "<id>"
 bitwarden_project_id: "<id>"
-email: "<email>"
-domain: "<example.com>"
-metallb_addresses: "192.168.1.xxx-192.168.1.xxx"
+cert_manager_domain_email: "<email>"
+cert_manager_domain_name: "<example.com>"
+ip_addresses: "192.168.1.xxx-192.168.1.xxx"
 ```
 
 Run playbook

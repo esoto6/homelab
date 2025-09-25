@@ -4,7 +4,9 @@
     name: "{{ cert_manager_alias }}"
     repo_url: "{{ cert_manager_repo }}"
 
-- block:
+- when: cert_manager_state == 'present'
+
+  block:
     - name: Ensure Cert-Manager namespace exists
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -103,11 +105,9 @@
         ) > 0
       retries: 60
       delay: 10
-      
-  when: cert_manager_state == 'present'
 
-    
-- block:
+- when: cert_manager_state == 'absent'
+  block:
     - name: Uninstall Cert-Manager
       kubernetes.core.helm:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -141,7 +141,7 @@
       ignore_errors: true
 
     - name: Delete cert-manager resources if CRD exists
-      shell: |
+      ansible.builtin.shell: |
         for crd in issuers.cert-manager.io clusterissuers.cert-manager.io certificates.cert-manager.io certificaterequests.cert-manager.io orders.acme.cert-manager.io challenges.acme.cert-manager.io; do
           if kubectl get crd $crd >/dev/null 2>&1; then
             kubectl delete --all --all-namespaces --ignore-not-found ${crd%%.*}
@@ -185,7 +185,7 @@
         - clusterissuers.cert-manager.io
       changed_when: false
       ignore_errors: true
-    
+
     - name: Delete Cert-Manager CRDs
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
@@ -215,5 +215,3 @@
         done
       changed_when: false
       ignore_errors: true
-
-  when: cert_manager_state == 'absent'
