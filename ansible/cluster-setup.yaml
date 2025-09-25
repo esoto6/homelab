@@ -54,7 +54,7 @@
         eso_bitwarden_project_id: "{{ bitwarden_project_id }}"
 
     - name: Install Traefik
-      import_tasks: tasks/3.traefik_app.yaml
+      import_tasks: tasks/4.traefik_app.yaml
       vars:
         kubeconfig_path: "~/.kube/config"
         traefik_namespace: "{{ traefik.namespace }}"
@@ -63,8 +63,16 @@
         traefik_repo: "{{ traefik.repo }}"
         traefik_alias: "{{ traefik.repository_alias }}"
         traefik_domain: "traefik.{{ cert_manager_domain_name }}"
-
     
-    # - name: Install ArgoCD
-    #   import_tasks: tasks/argocd.yamlk 
+    - name: Install ArgoCD
+      import_tasks: tasks/5.argocd-app.yaml
+      vars:
+        kubeconfig_path: "~/.kube/config"
+        argocd_namespace: "{{ argocd.namespace }}"
+        argocd_chart: "{{ argocd.chart }}"
+        argocd_version: "{{ argocd.version }}"
+        argocd_repo: "{{ argocd.repo }}"
+        argocd_alias: "{{ argocd.repository_alias }}"
+        argocd_domain: "argocd.{{ cert_manager_domain_name }}"
+        argocd_admin_password: "{{ argocd_admin_password }}"
 

@@ -26,7 +26,6 @@ traefik:
   version: 37.1.0
   repository_alias: traefik
   repo: "https://traefik.github.io/charts"
-  dashboard_domain: traefik.rubberduckops.com
 
 argocd:
   namespace: argocd

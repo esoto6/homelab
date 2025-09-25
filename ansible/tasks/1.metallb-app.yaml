@@ -31,17 +31,25 @@
         create_namespace: true
         state: present
 
-    - name: Wait for MetalLB pods to be ready
+    - name: Wait for MetalLB controller pod to be ready
       kubernetes.core.k8s_info:
         kubeconfig: "{{ kubeconfig_path }}"
         kind: Pod
         namespace: "{{ metallb_namespace }}"
-      register: metallb_pods
-      until: metallb_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
-      retries: 30
+        label_selectors:
+          - app=metallb
+      register: metallb_controller_pods
+      until: >
+        metallb_controller_pods.resources
+        | selectattr('status.phase', 'equalto', 'Running')
+        | selectattr('status.containerStatuses', 'defined')
+        | selectattr('status.containerStatuses', 'all',
+            attribute='ready')
+        | list | length == metallb_controller_pods.resources | length
+      retries: 40
       delay: 10
 
-    - name: Wait for all MetalLB Speaker pods to be running and ready
+    - name: Wait for MetalLB Speaker pods to be ready
       kubernetes.core.k8s_info:
         kubeconfig: "{{ kubeconfig_path }}"
         kind: Pod
@@ -56,9 +64,9 @@
         | selectattr('status.containerStatuses', 'all',
             attribute='ready')
         | list | length == metallb_speaker_pods.resources | length
-      retries: 30
+      retries: 40
       delay: 10
-      
+     
     - name: Wait for MetalLB CRDs to be ready
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
@@ -68,6 +76,10 @@
       retries: 15
       delay: 10
       
+    - name: Wait a bit for MetalLB webhook to initialize
+      ansible.builtin.pause:
+        seconds: 15
+        
     - name: Apply MetalLB IPAddressPool
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
