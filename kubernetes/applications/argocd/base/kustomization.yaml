@@ -14,3 +14,7 @@ resources:
 - ingress.yaml
 - certificate.yaml
 - external-secret-admin.yaml 
+
+commonLabels:
+  app.kubernetes.io/managed-by: argocd-kustomize
+  app.kubernetes.io/part-of: argocd
