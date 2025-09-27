@@ -7,8 +7,8 @@ configs:
     admin:
       existingSecret: argocd-admin-secret
       passwordKey: argocd_password
-secret:
-  createSecret: false
+# secret:
+#   createSecret: false
 server:
   ingress:
     enabled: false
@@ -22,5 +22,5 @@ server:
         port: 443
         targetPort: 8080
   extraArgs:
-    - --insecure # Disable TLS for the ArgoCD API server due to using an Ingress with TLS termination
+    - --insecure
     
