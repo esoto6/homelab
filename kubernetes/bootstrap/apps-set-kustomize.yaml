@@ -50,11 +50,7 @@ spec:
           - CreateNamespace=true
           - ApplyOutOfSyncOnly=true
       ignoreDifferences:
-        - group: ""
-          kind: Service
+        - group: "*"
+          kind: "*"
           jsonPointers:
-            - /metadata/labels/argocd.argoproj.io~1tracking-id
-        - group: ""
-          kind: Secret
-          jsonPointers:
-            - /stringData/admin.passwordMtime
+            - /metadata/annotations/argocd.argoproj.io~1tracking-id
