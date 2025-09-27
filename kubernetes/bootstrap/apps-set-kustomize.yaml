@@ -49,3 +49,12 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ApplyOutOfSyncOnly=true
+      ignoreDifferences:
+        - group: ""
+          kind: Service
+          jsonPointers:
+            - /metadata/labels/argocd.argoproj.io~1tracking-id
+        - group: ""
+          kind: Secret
+          jsonPointers:
+            - /stringData/admin.passwordMtime
