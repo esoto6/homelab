@@ -14,4 +14,3 @@ resources:
 - ingress.yaml
 - certificate.yaml
 - external-secret-admin.yaml 
-- bcrypt-job.yaml
