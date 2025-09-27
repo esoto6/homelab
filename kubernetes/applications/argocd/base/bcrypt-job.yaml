@@ -12,30 +12,13 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: hash-admin-password
-          image: python:3.12-slim
+          image: bitnami/kubectl:latest
           command:
             - /bin/sh
             - -c
             - |
               set -e
-
-              # Wait for ESO secret to exist
-              until kubectl get secret argocd-admin-secret -n argocd; do
-                echo "Waiting for argocd-admin-secret..."
-                sleep 5
-              done
-
-              # Wait for ArgoCD secret to exist
-              until kubectl get secret argocd-secret -n argocd; do
-                echo "Waiting for argocd-secret..."
-                sleep 5
-              done
-
-              # Read the plain password from ESO secret
+              until kubectl get secret argocd-admin-secret -n argocd; do sleep 5; done
               PASSWORD=$(kubectl get secret argocd-admin-secret -n argocd -o jsonpath="{.data.argocd_password}" | base64 --decode)
-
-              # Generate bcrypt hash
-              HASH=$(python3 -c "import bcrypt; print(bcrypt.hashpw(b'$PASSWORD', bcrypt.gensalt()).decode())")
-
-              # Patch the ArgoCD secret in-place
+              HASH=$(python3 -c "import bcrypt; print(__import__('bcrypt').hashpw(b'$PASSWORD', __import__('bcrypt').gensalt()).decode())")
               kubectl patch secret argocd-secret -n argocd --type merge -p "{\"stringData\":{\"admin.password\":\"$HASH\",\"admin.passwordMtime\":\"$(date +%FT%T%Z)\"}}"
