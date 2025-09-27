@@ -8,3 +8,5 @@ Install CRDS Manually
 helm pull aqua/trivy-operator --version 0.30.0 --untar
 
 rm -rf trivy-operator/
+
+

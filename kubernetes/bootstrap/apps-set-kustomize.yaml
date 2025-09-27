@@ -10,21 +10,21 @@ spec:
           - name: argocd
             path: kubernetes/applications/argocd/overlays/dev
             namespace: argocd
-          # - name: external-secrets
-          #   path: kubernetes/applications/external-secrets/base
-          #   namespace: external-secrets-system
-          # - name: traefik
-          #   path: kubernetes/applications/traefik/base
-          #   namespace: traefik
-          # - name: cert-manager
-          #   path: kubernetes/applications/cert-manager/overlays/dev
-          #   namespace: cert-manager
-          # - name: trivy-operator
-          #   namespace: trivy-system
-          #   path: kubernetes/applications/trivy-operator/base
-          # - name: nginx 
-          #   path: kubernetes/applications/nginx/overlays/dev
-          #   namespace: ngingx
+          - name: external-secrets
+            path: kubernetes/applications/external-secrets/base
+            namespace: external-secrets-system
+          - name: traefik
+            path: kubernetes/applications/traefik/base
+            namespace: traefik
+          - name: cert-manager
+            path: kubernetes/applications/cert-manager/overlays/dev
+            namespace: cert-manager
+          - name: trivy-operator
+            namespace: trivy-system
+            path: kubernetes/applications/trivy-operator/base
+          - name: nginx 
+            path: kubernetes/applications/nginx/overlays/dev
+            namespace: ngingx
           # - name: rancher
           #   path: kubernetes/applications/rancher/overlays/dev
           #   namespace: cattle-system
@@ -52,5 +52,6 @@ spec:
       ignoreDifferences:
         - group: "*"
           kind: "*"
+          namespace: "argocd"
           jsonPointers:
             - /metadata/annotations/argocd.argoproj.io~1tracking-id
