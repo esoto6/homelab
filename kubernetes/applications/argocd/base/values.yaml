@@ -4,7 +4,11 @@ configs:
   cm:
     kustomize.buildOptions: "--enable-helm"
   secret:
-    createSecret: false
+    admin:
+      existingSecret: argocd-admin-secret
+      passwordKey: argocd_password
+secret:
+  createSecret: false
 server:
   ingress:
     enabled: false
