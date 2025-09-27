@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-hash-admin-password
+  namespace: argocd
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      serviceAccountName: argocd-application-controller  # needs patch access
+      restartPolicy: OnFailure
+      containers:
+        - name: hash-admin-password
+          image: python:3.12-slim
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              # Wait for ESO secret to exist
+              until kubectl get secret argocd-admin-secret -n argocd; do
+                echo "Waiting for argocd-admin-secret..."
+                sleep 5
+              done
+
+              # Wait for ArgoCD secret to exist
+              until kubectl get secret argocd-secret -n argocd; do
+                echo "Waiting for argocd-secret..."
+                sleep 5
+              done
+
+              # Read the plain password from ESO secret
+              PASSWORD=$(kubectl get secret argocd-admin-secret -n argocd -o jsonpath="{.data.argocd_password}" | base64 --decode)
+
+              # Generate bcrypt hash
+              HASH=$(python3 -c "import bcrypt; print(bcrypt.hashpw(b'$PASSWORD', bcrypt.gensalt()).decode())")
+
+              # Patch the ArgoCD secret in-place
+              kubectl patch secret argocd-secret -n argocd --type merge -p "{\"stringData\":{\"admin.password\":\"$HASH\",\"admin.passwordMtime\":\"$(date +%FT%T%Z)\"}}"

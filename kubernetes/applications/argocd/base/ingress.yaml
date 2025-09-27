@@ -16,7 +16,7 @@ spec:
       middlewares:
         - name: argocd-forward-headers
     - kind: Rule
-      match: Host(`argocd.ruberduckops.com`) && Header(`Content-Type`, `application/grpc`)
+      match: Host(`argocd.rubberduckops.com`) && Header(`Content-Type`, `application/grpc`)
       priority: 11
       services:
         - name: argocd-server
