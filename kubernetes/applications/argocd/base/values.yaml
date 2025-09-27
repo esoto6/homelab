@@ -7,8 +7,8 @@ configs:
     admin:
       existingSecret: argocd-admin-secret
       passwordKey: argocd_password
-# secret:
-#   createSecret: false
+secret:
+  createSecret: false
 server:
   ingress:
     enabled: false
