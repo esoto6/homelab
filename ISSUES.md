@@ -9,6 +9,8 @@
 [ X ] cert-manager (wildcard certs)
 [ X ] external-secrets utilizing Bitwarden Secrets Manager
     - [  ] Utilizing ClusterSecretStore push secrets
+[ x ] Trivy Operator 
+    - [ ] Need to initialize CRDs prior to strapping
 [ ] Prometheus Grafana Stack w/ Dashboards
 [ ] Synology Cloud CSI or Proxmox CSI
 [ ] n8n

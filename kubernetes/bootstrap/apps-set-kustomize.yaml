@@ -24,10 +24,13 @@ spec:
             path: kubernetes/applications/trivy-operator/base
           - name: nginx 
             path: kubernetes/applications/nginx/overlays/dev
-            namespace: ngingx
-          # - name: rancher
-          #   path: kubernetes/applications/rancher/overlays/dev
-          #   namespace: cattle-system
+            namespace: nginx
+          - name: rancher
+            path: kubernetes/applications/rancher/overlays/dev
+            namespace: cattle-system
+          - name: monitoring
+            path: kubernetes/applications/monitoring/base
+            namespace: monitoring
   template:
     metadata:
       name: '{{name}}'
