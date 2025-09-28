@@ -17,26 +17,36 @@
           metadata:
             name: "{{ argocd_namespace }}"
 
-    - name: Get wildcard cert from source namespace
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ kubeconfig_path }}"
-        kind: Secret
-        namespace: cert-manager
-        name: wildcard-cert-tls
-      register: source_cert
-
-    - name: Apply wildcard cert to Traefik namespace
+    - name: Create ArgoCD Certificate
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
         definition:
-          apiVersion: v1
-          kind: Secret
+          apiVersion: cert-manager.io/v1
+          kind: Certificate
           metadata:
-            name: wildcard-cert-tls
+            name: argocd-cert
             namespace: "{{ argocd_namespace }}"
-          type: "{{ source_cert.resources[0].type }}"
-          data: "{{ source_cert.resources[0].data }}"
+          spec:
+            secretName: argocd-tls
+            issuerRef:
+              name: letsencrypt-stg
+              kind: ClusterIssuer
+
+            dnsNames:
+              - "{{ argocd_domain }}"
+
+    - name: Wait for ArgoCD Certificate to be ready
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Certificate
+        api_version: cert-manager.io/v1
+        name: argocd-cert
+        namespace: "{{ argocd_namespace }}"
+      register: argocd_cert_info
+      retries: 15
+      delay: 20
+      until: argocd_cert_info.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
 
     - name: Create admin password ExternalSecret
       kubernetes.core.k8s:

@@ -14,12 +14,12 @@
     external_secrets_state: present
     traefik_state: present
     argocd_state: present
+    kubeconfig_path: "~/projects/talos-cluster/cluster-kubeconfig"
 
   tasks:
     - name: Install MetalLB
       ansible.builtin.import_tasks: tasks/1.metallb-app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         metallb_namespace: "{{ metallb.namespace }}"
         metallb_chart: "{{ metallb.chart }}"
         metallb_version: "{{ metallb.version }}"
@@ -30,7 +30,6 @@
     - name: Install Cert-Manager
       ansible.builtin.import_tasks: tasks/2.cert-manager-app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         cert_manager_namespace: "{{ cert_manager.namespace }}"
         cert_manager_chart: "{{ cert_manager.chart }}"
         cert_manager_version: "{{ cert_manager.version }}"
@@ -43,7 +42,6 @@
     - name: Setup External Secrets
       ansible.builtin.import_tasks: tasks/3.external-secrets-app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         eso_namespace: "{{ external_secrets.namespace }}"
         eso_chart: "{{ external_secrets.chart }}"
         eso_version: "{{ external_secrets.version }}"
@@ -56,7 +54,6 @@
     - name: Install Traefik
       ansible.builtin.import_tasks: tasks/4.traefik_app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         traefik_namespace: "{{ traefik.namespace }}"
         traefik_chart: "{{ traefik.chart }}"
         traefik_version: "{{ traefik.version }}"
@@ -67,7 +64,6 @@
     - name: Install ArgoCD
       ansible.builtin.import_tasks: tasks/5.argocd-app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         argocd_namespace: "{{ argocd.namespace }}"
         argocd_chart: "{{ argocd.chart }}"
         argocd_version: "{{ argocd.version }}"
@@ -75,3 +71,11 @@
         argocd_alias: "{{ argocd.repository_alias }}"
         argocd_domain: "argocd.{{ cert_manager_domain_name }}"
         argocd_admin_password: "{{ argocd_admin_password }}"
+
+    - name: Install CRDs
+      ansible.builtin.import_tasks: tasks/6.install-crds.yaml
+      vars:
+        crd_charts:
+          - { alias: "{{ trivy.repository_alias }}", chart: "{{ trivy.chart }}", version: "{{ trivy.version }}", repo: "{{ trivy.repo }}", crd_path: crds}
+          - { alias: "{{ grafana.repository_alias }}", chart: "{{ grafana.chart }}", version: "{{ grafana.version }}", repo: "{{ grafana.repo }}" , crd_path: charts/crds/crds}
+          # - { alias: "{{ rancher.repository_alias }}", chart: "{{ rancher.chart }}", version: "{{ rancher.version }}", repo: "{{ rancher.repo }}", crd_path: crds}

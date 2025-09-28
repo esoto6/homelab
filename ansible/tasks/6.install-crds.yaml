@@ -1,0 +1,67 @@
+---
+- name: Ensure CRDs directory exists
+  file:
+    path: /tmp/helm-crds
+    state: directory
+
+- block:
+    - name: Add Helm repo for CRDs
+      ansible.builtin.command:
+        cmd: helm repo add {{ item.alias }} {{ item.repo }}
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
+
+    - name: Update Helm repos
+      ansible.builtin.command:
+        cmd: helm repo update
+
+    - name: Clean chart directory before pulling
+      ansible.builtin.file:
+        path: "/tmp/helm-crds/{{ item.chart | basename }}"
+        state: absent
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
+
+    - name: Pull Helm charts for CRDs
+      ansible.builtin.command:
+        cmd: >
+          helm pull {{ item.chart }}
+          --version {{ item.version }}
+          --untar
+          --untardir /tmp/helm-crds
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
+
+    - name: Apply CRDs from Helm charts
+      ansible.builtin.command:
+        cmd: >
+          kubectl apply --server-side
+          -f /tmp/helm-crds/{{ item.chart | basename }}/{{ item.crd_path }}
+          --kubeconfig {{ kubeconfig_path }}
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
+
+    # - name: Remove pulled chart directories after applying CRDs
+    #   ansible.builtin.file:
+    #     path: "/tmp/helm-crds/{{ item.chart | basename }}"
+    #     state: absent
+    #   loop: "{{ crd_charts }}"
+    #   loop_control:
+    #     label: "{{ item.chart }}"
+
+  when: crd_state | default("present") == "present"
+
+- block:
+    - name: Delete CRDs
+      ansible.builtin.command:
+        cmd: >
+          kubectl delete -f /tmp/helm-crds/{{ item.chart | basename }}/{{ item.crd_path }}
+          --kubeconfig {{ kubeconfig_path }} --ignore-not-found
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
+  when: crd_state | default("present") == "absent"

@@ -44,13 +44,13 @@ rancher:
 trivy:
   namespace: trivy-systems
   chart: aqua/trivy-operator
-  verion: 0.30.0
+  version: 0.30.0
   repository_alias: trivy-operator
   repo: https://aquasecurity.github.io/helm-charts/
 
 grafana:
   namespace: monitoring
   chart: prometheus-community/kube-prometheus-stack
-  verion: 77.11.1
+  version: 77.11.1
   repository_alias: prometheus-community
   repo: https://prometheus-community.github.io/helm-charts

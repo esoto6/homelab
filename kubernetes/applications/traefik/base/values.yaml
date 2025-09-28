@@ -20,4 +20,4 @@ ingressRoute:
     entryPoints: ["websecure"]
     matchRule: "Host(`traefik.rubberduckops.com`)"
     tls:
-      secretName: wildcard-cert-tls
+      secretName: traefik-tls
