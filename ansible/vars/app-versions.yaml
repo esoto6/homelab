@@ -33,3 +33,24 @@ argocd:
   version: 8.3.8
   repository_alias: argo
   repo: "https://argoproj.github.io/argo-helm"
+
+rancher:
+  namespace: cattle-system
+  chart: rancher/rancher
+  version: 2.12.1
+  repository_alias: rancher
+  repo: https://releases.rancher.com/server-charts/stable
+
+trivy:
+  namespace: trivy-systems
+  chart: aqua/trivy-operator
+  verion: 0.30.0
+  repository_alias: trivy-operator
+  repo: https://aquasecurity.github.io/helm-charts/
+
+grafana:
+  namespace: monitoring
+  chart: prometheus-community/kube-prometheus-stack
+  verion: 77.11.1
+  repository_alias: prometheus-community
+  repo: https://prometheus-community.github.io/helm-charts
