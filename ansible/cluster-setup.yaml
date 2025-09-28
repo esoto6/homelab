@@ -14,6 +14,7 @@
     external_secrets_state: present
     traefik_state: present
     argocd_state: present
+    crd_state: present
     kubeconfig_path: "~/projects/talos-cluster/cluster-kubeconfig"
 
   tasks:
