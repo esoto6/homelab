@@ -65,6 +65,11 @@ kubeControllerManager:
   enabled: true
   selector:
     k8s-app: kube-controller-manager
+  service:
+    ipDualStack:
+      enabled: false
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
   serviceMonitor:
     enabled: true
     relabelings:
@@ -89,6 +94,10 @@ kubeEtcd:
     targetPort: 2381
     selector:
       k8s-app: kube-controller-manager
+    ipDualStack:
+      enabled: false
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
   serviceMonitor:
     enabled: true
     scheme: http
@@ -106,6 +115,10 @@ kubeScheduler:
     enabled: true
     selector:
       k8s-app: kube-scheduler
+    ipDualStack:
+      enabled: false
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
   serviceMonitor:
     enabled: true
     relabelings:
@@ -121,6 +134,10 @@ kubeProxy:
   service:
     port: 10249
     targetPort: 10249
+    ipDualStack:
+      enabled: false
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
   serviceMonitor:
     selfMonitor: true
     scheme: http
