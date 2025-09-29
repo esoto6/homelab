@@ -80,7 +80,7 @@ kubeEtcd:
     targetPort: 2381
   serviceMonitor:
     enabled: true
-    scheme: https
+    scheme: http
 
 kubeScheduler:
   enabled: true
