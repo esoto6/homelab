@@ -11,4 +11,4 @@ helmCharts:
 
 resources:
   - namespace.yaml
-  - Certificate.yaml
+  - certificate.yaml
