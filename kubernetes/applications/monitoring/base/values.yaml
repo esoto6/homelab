@@ -63,8 +63,17 @@ kubelet:
 
 kubeControllerManager:
   enabled: true
+  selector:
+    k8s-app: kube-controller-manager
   serviceMonitor:
     enabled: true
+    relabelings:
+      - action: replace
+        sourceLabels: [__meta_kubernetes_pod_node_name]
+        targetLabel: nodename
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
 
 coreDns:
   enabled: true
@@ -78,14 +87,34 @@ kubeEtcd:
     enabled: true
     port: 2381
     targetPort: 2381
+    selector:
+      k8s-app: kube-controller-manager
   serviceMonitor:
     enabled: true
     scheme: http
+    relabelings: 
+      - action: replace 
+        sourceLabels: [__meta_kubernetes_pod_node_name]
+        targetLabel: nodename
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
 
 kubeScheduler:
   enabled: true
+  service:
+    enabled: true
+    selector:
+      k8s-app: kube-scheduler
   serviceMonitor:
     enabled: true
+    relabelings:
+      - action: replace
+        sourceLabels: [__meta_kubernetes_pod_node_name]
+        targetLabel: nodename
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
 
 kubeProxy:
   enabled: true
