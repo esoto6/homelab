@@ -18,18 +18,17 @@ The homelab initially started with running a K3s cluster running in Proxmox on a
 - talosctl
 
 
-### Steps
+## Setup Cluster
 
->[!NOTE]
->Need to figure out how to automate cluster creation
-
-1. Setup Talos Cluster manually
+1. Setup Talos Cluster
 2. [Ansible Pre Sync](/ansible/README.md)
 3. Once ArgoCD is installed bootstrap cluster
 
 ```sh
-kubectl apply -f bootstrap/apps-set-kustomize.yaml
+kubectl apply -f kubernetes/bootstrap/apps-set-kustomize.yaml
 ```
 
-# [Issues](ISSUES.md)
+>[!NOTE]
+>Items to do/complete
+>[Todo List](TODO.md)
 

@@ -79,4 +79,3 @@
         crd_charts:
           - { alias: "{{ trivy.repository_alias }}", chart: "{{ trivy.chart }}", version: "{{ trivy.version }}", repo: "{{ trivy.repo }}", crd_path: crds}
           - { alias: "{{ grafana.repository_alias }}", chart: "{{ grafana.chart }}", version: "{{ grafana.version }}", repo: "{{ grafana.repo }}" , crd_path: charts/crds/crds}
-          # - { alias: "{{ rancher.repository_alias }}", chart: "{{ rancher.chart }}", version: "{{ rancher.version }}", repo: "{{ rancher.repo }}", crd_path: crds}

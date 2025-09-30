@@ -1,14 +1,17 @@
 
 # Ansible
 
-This ansible script will create the core apps required to get my cluster setup. 
+This ansible script is utilized to initial start my cluster or initiate core components that are needed for almost every app within my cluster.
 
 Apps:
-- Metallb
-- Cert-Manager
-- External-Secrets w/ Bitwarden Secrets Manager
-- Traefik
-- ArgoCD
+- Metallb (LoadBalancer)
+- Cert-Manager (Manage Certificate w/ DNS01 Challenge)
+- External-Secrets w/ Bitwarden Secrets Manager (Retrieve Secrets)
+- Traefik (Ingress Controller)
+- ArgoCD (GitOps)
+- Pre Install Additional CRDs as needed
+    - Trivy
+    - Grafana
 
 # Run Ansible Script
 
@@ -16,7 +19,7 @@ Apps:
 2. Populate newly created file with the below structure
 
 ```sh
-cloudflare_api_token: "<token>"
+cloudflare_token: "<token>"
 bitwarden_access_token: "<token>"
 bitwarden_organization_id: "<id>"
 bitwarden_project_id: "<id>"
@@ -28,7 +31,7 @@ ip_addresses: "192.168.1.xxx-192.168.1.xxx"
 
 # Setup and Teardown of Ansible Managed Applications
 
-# Setup Apps
+## Setup Apps
 
 1. Create Initial Apps
 Run playbook
@@ -36,7 +39,7 @@ Run playbook
 ansible-playbook ansible/cluster-setup.yaml
 ```
 
-# Teardown Apps
+## Teardown Apps
 
 1. Teardown Ansible created Apps
 Reset Cluster
