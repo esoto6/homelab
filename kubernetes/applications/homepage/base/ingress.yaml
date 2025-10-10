@@ -1,0 +1,21 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homepage
+  namespace: homepage
+  annotations:
+    gethomepage.dev/href: "https://homepage.rubberduckops.com"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: "My Dashboard Homepage"
+    gethomepage.dev/name: "Homepage"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`homepage.rubberduckops.com`)
+      kind: Rule
+      services:
+        - name: homepage
+          port: 3000
+  tls:
+    secretName: homepage-tls

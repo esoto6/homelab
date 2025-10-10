@@ -31,6 +31,9 @@ spec:
           - name: monitoring
             path: kubernetes/applications/monitoring/base
             namespace: monitoring
+          - name: homepage
+            path: kubernetes/applications/homepage/base
+            namespace: homepage 
   template:
     metadata:
       name: '{{name}}'

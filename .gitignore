@@ -58,12 +58,11 @@ kubernetes/external-secrets/secret.yaml
 
 charts*
 
-secret.yaml
 secretstore.yaml
 values2.yaml
 
 
 metallb-system.yaml
 
-secrets.yaml
+
 app-secrets.yaml

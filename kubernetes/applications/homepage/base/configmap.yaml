@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage
+  namespace: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+data:
+  settings.yaml: |
+    title: Rubber Duck Ops Homepage
+    description: Dashboard for my home lab
+    theme: dark
+    color: slate
+    useEqualHeights: true
+
+    layout:
+      Infrastructure:
+        header: true
+        style: row
+        columns: 3
+      Containers:
+        header: true
+        style: row
+        columns: 2
+      PVE Apps:
+        header: true
+        style: row
+        columns: 3
+      K8s:
+        header: true
+        style: row
+        columns: 4
+      Network:
+        header: true
+        style: row
+        columns: 3
+
+  bookmarks.yaml: ""
+
+  kubernetes.yaml: |
+    mode: cluster
+
+  custom.css: ""
+  custom.js: ""
+  docker.yaml: ""
+
+  services.yaml: |
+    - Infrastructure:
+        - Proxmox:
+            icon: proxmox.png
+            href: https://pve.rubberduckops.com:8006
+            description: Proxmox VE
+            widget:
+                type: proxmox
+                url: https://pve.rubberduckops.com:8006
+                username: ${PROXMOX_USERNAME}
+                password: ${PROXMOX_PASSWORD}
+                node: pve
+        - Synology:
+            icon: synology.png
+            href: https://synology.rubberduckops.com:5001
+            description: DS213j
+            widget:
+              type: diskstation
+              url: https://synology.rubberduckops.com:5001
+              username: ${SYNOLOGY_USERNAME}
+              password: ${SYNOLOGY_PASSWORD}
+
+        - Talos:
+            icon: talos.png
+            href: talos-master-01
+            description: Talos
+
+    - Containers:
+        - Nginx Proxy Manager:
+            icon: nginx-proxy-manager.png
+            href: https://nginx-proxy.rubberduckops.com
+            description: Reverse Proxy
+            widget:
+                type: npm
+                url: https://nginx-proxy.rubberduckops.com
+                username: ${NPM_USERNAME}
+                password: ${NPM_PASSWORD}
+        - Watchtower:
+            icon: watchtower.png
+            href: http://watchtower.rubberduckops.com
+            description: Watchtower
+            widget:
+                type: watchtower
+                url: http://watchtower.rubberduckops.com
+                key: ${WATCHTOWER_PASSWORD}
+    - PVE Apps:
+        - Homepage:
+            icon: homepage.png
+            href: http://homepage.rubberduckops.com
+            description: Homepage Dashboard
+        - n8n:
+            icon: n8n.png
+            href: http://n8n.rubberduckops.com
+            description: n8n
+        - ollama:
+            icon: ollama.png
+            href: http://ollama.rubberduckops.com
+            description: ollama
+    - K8s:
+        - Traefik:
+            icon: traefik-proxy.png
+            href: http://traefik.rubberduckops.com
+            description: Traefik
+            namespace: traefik
+            app: traefik
+            widget:
+                type: traefik
+                url: https://traefik.rubberduckops.com
+        - Nginx:
+            icon: nginx.png
+            href: https://nginx.rubberduckops.com
+            description: Test Page
+            namespace: nginx
+            app: nginx
+        - ArgoCD:
+            icon: argo-cd.png
+            href: https://argocd.rubberduckops.com
+            description: ArgoCD
+            namespace: argocd
+            app: argocd-server
+        - Grafana:
+            icon: grafana.png
+            href: https://grafana.rubberduckops.com
+            description: Grafana
+            namespace: monitoring
+            app: grafana
+            widget:
+                type: grafana
+                version: 2
+                alerts: alertmanager
+                url: https://grafana.rubberduckops.com
+                username: ${GRAFANA_USERNAME}
+                password: ${GRAFANA_PASSWORD}
+    - Network:
+        - Pi Hole:
+            icon: pi-hole.png
+            href: https://pi-hole.rubberduckops.com/admin
+            description: Pi Hole
+            widget:
+                type: pihole
+                url: https://pi-hole.rubberduckops.com
+                version: 6
+                key: ${PIHOLE_PASSWORD}
+        - Uptime Kuma:
+            icon: uptime-kuma.png
+            href: https://uptime-kuma.rubberduckops.com
+            description: Internal
+            widget:
+                type: uptimekuma
+                url: https://uptime-kuma.rubberduckops.com
+                slug: pages
+        - Twingate:
+            icon: twingate.png
+            href: https://ravagenapkins.twingate.com/
+            description: VPN  
+  widgets.yaml: |
+    - kubernetes: 
+        cluster:
+            show: true
+            cpu: true
+            memory: true
+            showLabel: true
+            label: "cluster"
+        nodes:
+            show: true
+            cpu: true
+            memory: true
+            showLabel: true
+    - resources:
+        backend: resources
+        expanded: false
+        cpu: false
+        memory: false
+        network: default
+    - search:
+        provider: duckduckgo
+        target: _blank

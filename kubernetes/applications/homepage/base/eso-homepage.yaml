@@ -1,0 +1,44 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: homepage-secrets
+  namespace: homepage
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: bitwarden-cluster-secretstore
+    kind: ClusterSecretStore
+  target:
+    name: homepage-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: PROXMOX_USERNAME
+      remoteRef:
+        key: homepage/proxmox/username
+    - secretKey: PROXMOX_PASSWORD
+      remoteRef:
+        key: homepage/proxmox/password
+    - secretKey: SYNOLOGY_USERNAME
+      remoteRef:
+        key: homepage/synology/username
+    - secretKey: SYNOLOGY_PASSWORD
+      remoteRef:
+        key: homepage/synology/password
+    - secretKey: NPM_USERNAME
+      remoteRef:
+        key: homepage/npm/username
+    - secretKey: NPM_PASSWORD
+      remoteRef:
+        key: homepage/npm/password
+    - secretKey: WATCHTOWER_PASSWORD
+      remoteRef:
+        key: homepage/watchtower/key
+    - secretKey: GRAFANA_USERNAME
+      remoteRef:
+        key: homepage/grafana/username
+    - secretKey: GRAFANA_PASSWORD
+      remoteRef:
+        key: homepage/grafana/password
+    - secretKey: PIHOLE_PASSWORD
+      remoteRef:
+        key: homepage/pihole/key
