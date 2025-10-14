@@ -40,21 +40,12 @@ spec:
               set -e
               apk add --no-cache gettext yq
 
-              echo "🔧 Interpolating and validating configs..."
+              echo "Interpolating and validating configs..."
               mkdir -p /generated
 
               envsubst < /configmap/services.yaml > /generated/services.yaml
 
-
-              echo "🔍 Validating YAML syntax..."
-              for file in /generated/*.yaml; do
-                echo "Checking $file..."
-                yq e '.' "$file" >/dev/null
-              done
-
-              echo "✅ Config generation completed."
-
-              echo "🔧 Copying other config files..."
+              echo "Copying other config files..."
               cp /configmap/custom.js /generated/ || true
               cp /configmap/custom.css /generated/ || true
               cp /configmap/bookmarks.yaml /generated/ || true

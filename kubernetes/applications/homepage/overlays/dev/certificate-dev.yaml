@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homepage-cert
+  namespace: homepage
+spec:
+  secretName: homepage-tls
+  issuerRef:
+    name: letsencrypt-stg
+    kind: ClusterIssuer
+  dnsNames:
+    - homepage.rubberduckops.com

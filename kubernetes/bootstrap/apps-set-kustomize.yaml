@@ -29,10 +29,10 @@ spec:
           #   path: kubernetes/applications/rancher/overlays/dev
           #   namespace: cattle-system
           - name: monitoring
-            path: kubernetes/applications/monitoring/base
+            path: kubernetes/applications/monitoring/overlays/dev
             namespace: monitoring
           - name: homepage
-            path: kubernetes/applications/homepage/base
+            path: kubernetes/applications/homepage/overlays/dev
             namespace: homepage 
   template:
     metadata:

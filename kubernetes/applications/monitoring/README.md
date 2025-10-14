@@ -22,10 +22,10 @@ https://github.com/timothystewart6/launchpad/blob/master/kubernetes/kube-prometh
 
 
 
-kubectl kustomize kubernetes/apps/monitoring/base --enable-helm
+kubectl kustomize kubernetes/apps/monitoring/overlays/dev --enable-helm
 
 
-kubectl kustomize kubernetes/applications/monitoring/base --enable-helm | kubectl apply -f -
+kubectl kustomize kubernetes/applications/monitoring/overlays/dev --enable-helm | kubectl apply -f -
 
 
 Note:
