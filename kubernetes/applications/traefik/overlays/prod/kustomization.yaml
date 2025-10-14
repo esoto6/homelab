@@ -5,4 +5,4 @@ namespace: traefik
 resources:
   - ../../base
 patches:
-  - certificate-prod.yaml
+  - path: certificate-prod.yaml

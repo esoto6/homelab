@@ -5,4 +5,4 @@ namespace: homepage
 resources:
   - ../../base
 patches:
-  - certificate-dev.yaml
+  - path: certificate-dev.yaml

@@ -5,4 +5,4 @@ namespace: homepage
 resources:
   - ../../base
 patches:
-  - certificate-pod.yaml
+  - path: certificate-prod.yaml
