@@ -14,7 +14,7 @@ spec:
             path: kubernetes/applications/external-secrets/base
             namespace: external-secrets-system
           - name: traefik
-            path: kubernetes/applications/traefik/base
+            path: kubernetes/applications/traefik/overlays/dev
             namespace: traefik
           - name: cert-manager
             path: kubernetes/applications/cert-manager/overlays/dev
