@@ -4,40 +4,43 @@ metadata:
   name: kustomize-apps
   namespace: argocd
 spec:
-  templateVars:
-    env: dev
   generators:
-    - list:
-        elements:
-          - name: argocd
-            path: kubernetes/applications/argocd
-            namespace: argocd
-          - name: external-secrets
-            path: kubernetes/applications/external-secrets
-            namespace: external-secrets-system
-            overlay: base
-          - name: traefik
-            path: kubernetes/applications/traefik
-            namespace: traefik
-          - name: cert-manager
-            path: kubernetes/applications/cert-manager
-            namespace: cert-manager
-          - name: trivy-operator
-            namespace: trivy-system
-            path: kubernetes/applications/trivy-operator
-            overlay: base
-          - name: nginx 
-            path: kubernetes/applications/nginx/overlays/dev
-            namespace: nginx
-          # - name: rancher
-          #   path: kubernetes/applications/rancher
-          #   namespace: cattle-system
-          - name: monitoring
-            path: kubernetes/applications/monitoring
-            namespace: monitoring
-          - name: homepage
-            path: kubernetes/applications/homepage
-            namespace: homepage 
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - env: dev
+          - list:
+              elements:
+                - name: argocd
+                  path: kubernetes/applications/argocd
+                  namespace: argocd
+                - name: external-secrets
+                  path: kubernetes/applications/external-secrets
+                  namespace: external-secrets-system
+                  overlay: base
+                - name: traefik
+                  path: kubernetes/applications/traefik
+                  namespace: traefik
+                - name: cert-manager
+                  path: kubernetes/applications/cert-manager
+                  namespace: cert-manager
+                - name: trivy-operator
+                  namespace: trivy-system
+                  path: kubernetes/applications/trivy-operator
+                  overlay: base
+                - name: nginx 
+                  path: kubernetes/applications/nginx/overlays/dev
+                  namespace: nginx
+                # - name: rancher
+                #   path: kubernetes/applications/rancher
+                #   namespace: cattle-system
+                - name: monitoring
+                  path: kubernetes/applications/monitoring
+                  namespace: monitoring
+                - name: homepage
+                  path: kubernetes/applications/homepage
+                  namespace: homepage 
   template:
     metadata:
       name: '{{name}}'
@@ -50,7 +53,7 @@ spec:
       source:
         repoURL: https://github.com/esoto6/homelab.git
         targetRevision: HEAD
-        path: '{{basePath}}/{{overlay | default "overlays/{{env}}"}}'
+        path: '{{path}}{{#overlay}}/{{overlay}}{{/overlay}}{{^overlay}}/overlays/{{env}}{{/overlay}}'
         #path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
