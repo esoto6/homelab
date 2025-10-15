@@ -30,7 +30,7 @@ spec:
                   path: kubernetes/applications/trivy-operator
                   overlay: base
                 - name: nginx 
-                  path: kubernetes/applications/nginx/overlays/dev
+                  path: kubernetes/applications/nginx
                   namespace: nginx
                 # - name: rancher
                 #   path: kubernetes/applications/rancher
