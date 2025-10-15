@@ -4,6 +4,8 @@ metadata:
   name: kustomize-apps
   namespace: argocd
 spec:
+  goTemplate: true
+  goTemplateOptions: ['missingkey=error']
   generators:
     - matrix:
         generators:
@@ -43,9 +45,9 @@ spec:
                   namespace: homepage 
   template:
     metadata:
-      name: '{{name}}'
+      name: '{{.name}}'
       labels:
-        environment: '{{ env }}'
+        environment: '{{ .env }}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
@@ -53,11 +55,10 @@ spec:
       source:
         repoURL: https://github.com/esoto6/homelab.git
         targetRevision: HEAD
-        path: '{{path}}{{#overlay}}/{{overlay}}{{/overlay}}{{^overlay}}/overlays/{{env}}{{/overlay}}'
-        #path: '{{path}}'
+        path: '{{.path}}{{if .overlay}}/{{.overlay}}{{else}}/overlays/{{.env}}{{end}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{namespace}}'
+        namespace: '{{ .namespace }}'
       syncPolicy:
         automated:
           prune: true
