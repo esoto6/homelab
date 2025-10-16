@@ -25,3 +25,24 @@ Deploy manually
 ```sh
 kustomize build applications/argocd/overlays/dev --enable-helm | kubecctl apply -f -
 ```
+
+
+Get Applicationset
+```sh
+k get applicationset kustomize-apps -n argocd -o yaml
+```
+
+
+## Force remove argocd
+Get the namespace JSON
+```sh
+kubectl get namespace argocd -o json > argocd-ns.json
+```
+Edit it to remove finalizers
+```sh
+cat argocd-ns.json | jq '.spec.finalizers = []' > argocd-ns-clean.json
+```
+Replace the namespace spec
+```sh
+kubectl replace --raw "/api/v1/namespaces/argocd/finalize" -f argocd-ns-clean.json
+```

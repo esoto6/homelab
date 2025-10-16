@@ -51,11 +51,11 @@
           apiVersion: cert-manager.io/v1
           kind: ClusterIssuer
           metadata:
-            name: letsencrypt-stg
+            name: "{{ 'letsencrypt-prod' if k8s_env == 'prod' else 'letsencrypt-staging' }}"
           spec:
             acme:
               email: "{{ domain_email }}"
-              server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+              server: "{{ 'https://acme-v02.api.letsencrypt.org/directory' if k8s_env == 'prod' else 'https://acme-staging-v02.api.letsencrypt.org/directory' }}"
               privateKeySecretRef:
                 name: cloudflare-token
               solvers:
@@ -79,7 +79,7 @@
           spec:
             secretName: wildcard-cert-tls
             issuerRef:
-              name: letsencrypt-stg
+              name: "{{ 'letsencrypt-prod' if k8s_env == 'prod' else 'letsencrypt-staging' }}"
               kind: ClusterIssuer
             commonName: "*.{{ domain_name }}"
             dnsNames:

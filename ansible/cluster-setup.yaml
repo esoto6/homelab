@@ -16,6 +16,7 @@
     argocd_state: present
     crd_state: present
     kubeconfig_path: "~/projects/talos-cluster/cluster-kubeconfig"
+    k8s_env: dev # Change to 'prod' for production environment
 
   tasks:
     - name: Install MetalLB

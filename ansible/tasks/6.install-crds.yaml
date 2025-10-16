@@ -45,13 +45,13 @@
       loop_control:
         label: "{{ item.chart }}"
 
-    # - name: Remove pulled chart directories after applying CRDs
-    #   ansible.builtin.file:
-    #     path: "/tmp/helm-crds/{{ item.chart | basename }}"
-    #     state: absent
-    #   loop: "{{ crd_charts }}"
-    #   loop_control:
-    #     label: "{{ item.chart }}"
+    - name: Remove pulled chart directories after applying CRDs
+      ansible.builtin.file:
+        path: "/tmp/helm-crds/{{ item.chart | basename }}"
+        state: absent
+      loop: "{{ crd_charts }}"
+      loop_control:
+        label: "{{ item.chart }}"
 
   when: crd_state | default("present") == "present"
 

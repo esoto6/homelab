@@ -30,7 +30,7 @@
           spec:
             secretName: traefik-tls
             issuerRef:
-              name: letsencrypt-stg
+              name: "{{ 'letsencrypt-prod' if k8s_env == 'prod' else 'letsencrypt-staging' }}"
               kind: ClusterIssuer
 
             dnsNames:

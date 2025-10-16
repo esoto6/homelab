@@ -15,11 +15,13 @@
     traefik_state: absent
     argocd_state: absent
     crd_state: absent
-    kubeconfig_path: "~/project/talos-cluster/cluster-kubeconfig"
+    kubeconfig_path: "~/projects/talos-cluster/cluster-kubeconfig"
+    #kubeconfig_path: "{{ lookup('env', 'HOME') }}/projects/talos-cluster/cluster-kubeconfig"
+
   tasks:
-    - ansible.builtin.import_tasks: tasks/1.metallb-app.yaml
+    - name: Uninstall MetalLB
+      ansible.builtin.import_tasks: tasks/1.metallb-app.yaml
       vars:
-        kubeconfig_path: "~/.kube/config"
         metallb_namespace: "{{ metallb.namespace }}"
         metallb_chart: "{{ metallb.chart }}"
         metallb_version: "{{ metallb.version }}"
@@ -27,7 +29,8 @@
         metallb_alias: "{{ metallb.repository_alias }}"
         metallb_addresses: "{{ ip_addresses }}"
 
-    - ansible.builtin.import_tasks: tasks/2.cert-manager-app.yaml
+    - name: Uninstall Cert-Manager
+      ansible.builtin.import_tasks: tasks/2.cert-manager-app.yaml
       vars:
         cert_manager_namespace: "{{ cert_manager.namespace }}"
         cert_manager_chart: "{{ cert_manager.chart }}"

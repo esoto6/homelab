@@ -30,7 +30,7 @@
           spec:
             secretName: argocd-tls
             issuerRef:
-              name: letsencrypt-stg
+              name: "{{ 'letsencrypt-prod' if k8s_env == 'prod' else 'letsencrypt-staging' }}"
               kind: ClusterIssuer
 
             dnsNames:
@@ -125,9 +125,22 @@
         name: argocd-admin-secret
       register: eso_secret
 
-    - name: Generate bcrypt hash of password
+    - name: Decode ArgoCD admin password from secret
       ansible.builtin.set_fact:
-        argocd_bcrypt_password: "{{ eso_secret.resources[0].data['argocd_password'] | b64decode | password_hash('bcrypt') }}"
+        decoded_argocd_password: "{{ eso_secret.resources[0].data['argocd_password'] | b64decode | trim }}"
+      when: eso_secret.resources | length > 0
+      no_log: false
+
+    - name: Debug decoded password and length
+      ansible.builtin.debug:
+        msg:
+          - "Decoded password: {{ decoded_argocd_password }}"
+          - "Length: {{ decoded_argocd_password | length }}"
+
+    - name: Generate bcrypt hash of password (for ArgoCD)
+      ansible.builtin.set_fact:
+        argocd_bcrypt_password: "{{ decoded_argocd_password | password_hash('bcrypt') }}"
+      when: decoded_argocd_password is defined
 
     - name: Patch ArgoCD secret with bcrypt password
       kubernetes.core.k8s:
@@ -142,6 +155,7 @@
           stringData:
             admin.password: "{{ argocd_bcrypt_password }}"
             admin.passwordMtime: "{{ lookup('pipe', 'date +%FT%T%Z') }}"
+      when: argocd_bcrypt_password is defined
 
     - name: Apply ArgoCD IngressRoute for Traefik
       kubernetes.core.k8s:
@@ -170,7 +184,7 @@
                     port: 80
                     scheme: h2c
             tls:
-              secretName: wildcard-cert-tls
+              secretName: traefik-tls
 
     - name: Wait for ArgoCD server deployment to be ready
       kubernetes.core.k8s_info:
