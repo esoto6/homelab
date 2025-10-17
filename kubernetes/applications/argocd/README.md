@@ -46,3 +46,11 @@ Replace the namespace spec
 ```sh
 kubectl replace --raw "/api/v1/namespaces/argocd/finalize" -f argocd-ns-clean.json
 ```
+
+
+Creating Homepage user for API:
+argocd login argocd.rubberduckops.com
+
+argocd account generate-token --account homepage
+
+Copy output and update secret in bitwarden. Need to automate. 

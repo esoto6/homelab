@@ -3,10 +3,14 @@ global:
 configs:
   cm:
     kustomize.buildOptions: "--enable-helm"
+    accounts.homepage: api-key
   secret:
     admin:
       existingSecret: argocd-admin-secret
       passwordKey: argocd_password
+  rbac:
+    policy.csv: |
+      g, homepage, role:readonly
 secret:
   createSecret: false
 server:

@@ -42,3 +42,6 @@ spec:
     - secretKey: PIHOLE_PASSWORD
       remoteRef:
         key: homepage/pihole/key
+    - secretKey: ARGOCD_PASSWORD
+      remoteRef:
+        key: homepage/argocd/key

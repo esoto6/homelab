@@ -124,6 +124,10 @@ data:
             description: ArgoCD
             namespace: argocd
             app: argocd-server
+            widget:
+                type: argocd
+                url: https://argocd.rubberduckops.com
+                password: ${ARGOCD_PASSWORD}
         - Grafana:
             icon: grafana.png
             href: https://grafana.rubberduckops.com
