@@ -72,7 +72,7 @@
         argocd_repo: "{{ argocd.repo }}"
         argocd_alias: "{{ argocd.repository_alias }}"
         argocd_domain: "argocd.{{ cert_manager_domain_name }}"
-        argocd_admin_password: "{{ argocd_admin_password }}"
+        argocd_admin_pass: "{{ argocd_admin_password }}"
 
     - name: Install CRDs
       ansible.builtin.import_tasks: tasks/6.install-crds.yaml

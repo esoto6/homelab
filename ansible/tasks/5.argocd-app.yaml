@@ -203,6 +203,80 @@
       retries: 15
       delay: 20
 
+    - name: Login to ArgoCD CLI
+      ansible.builtin.shell: |
+        argocd login "{{ argocd_domain }}" \
+           --username admin \
+           --password "{{ argocd_admin_pass }}" \
+           --grpc-web \
+           --insecure 
+      changed_when: false
+      # no_log: true
+
+    - name: Generate ArgoCD API token for homepage user
+      ansible.builtin.shell: |
+        argocd account generate-token --account homepage
+      register: argocd_homepage_token
+      changed_when: false
+      no_log: true
+
+    - name: Create temporary secret with ArgoCD token
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: argocd-homepage-token-temp
+            namespace: "{{ argocd_namespace }}"
+          type: Opaque
+          stringData:
+            token: "{{ argocd_homepage_token.stdout }}"
+    
+    - name: Create PushSecret to push token to Bitwarden
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: external-secrets.io/v1alpha1
+          kind: PushSecret
+          metadata:
+            name: argocd-homepage-token-push
+            namespace: "{{ argocd_namespace }}"
+          spec:
+            deletionPolicy: Delete
+            refreshInterval: 10s
+            secretStoreRefs:
+              - name: bitwarden-cluster-secretstore
+                kind: ClusterSecretStore
+            selector:
+              secret:
+                name: argocd-homepage-token-temp
+            data:
+              - match:
+                  secretKey: token
+                  remoteRef:
+                    remoteKey: homepage/argocd/token
+    
+    - name: Wait for PushSecret to sync token to Bitwarden
+      ansible.builtin.pause:
+        seconds: 30
+        prompt: "Waiting for PushSecret to push token to Bitwarden..."
+    
+    - name: Verify PushSecret status
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        api_version: external-secrets.io/v1alpha1
+        kind: PushSecret
+        name: argocd-homepage-token-push
+        namespace: "{{ argocd_namespace }}"
+      register: push_secret_status
+    
+    - name: Display PushSecret status
+      ansible.builtin.debug:
+        msg: "PushSecret status: {{ push_secret_status.resources[0].status | default('Not available yet') }}"
+
 - when: argocd_state is defined and argocd_state == 'absent'
   block:
     - name: Get all CRDs for ArgoCD
