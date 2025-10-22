@@ -127,7 +127,7 @@ data:
             widget:
                 type: argocd
                 url: https://argocd.rubberduckops.com
-                password: ${ARGOCD_PASSWORD}
+                key: ${ARGOCD_PASSWORD}
         - Grafana:
             icon: grafana.png
             href: https://grafana.rubberduckops.com
