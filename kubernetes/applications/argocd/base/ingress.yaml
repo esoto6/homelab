@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`argocd.rubberduckops.com`) && PathPrefix(`/api`)
+    - match: Host(`argocd.rubberduckops.com`) && PathPrefix(`/`) || PathPrefix(`/api/`) || PathPrefix(`/swagger-ui`) 
       kind: Rule
       priority: 10
       services:
