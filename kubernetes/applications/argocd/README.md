@@ -1,7 +1,7 @@
 # ArgoCD
 
 List all available chart versions
-```
+```sh
 helm search repo argo/argo-cd --versions
 ```
 
@@ -49,8 +49,21 @@ kubectl replace --raw "/api/v1/namespaces/argocd/finalize" -f argocd-ns-clean.js
 
 
 Creating Homepage user for API:
+```sh
 argocd login argocd.rubberduckops.com
-
-argocd account generate-token --account homepage
-
+```
 Copy output and update secret in bitwarden. Need to automate. 
+```sh
+argocd account generate-token --account homepage
+```
+
+
+
+# Update token from homepage to trigger eso to push secret
+
+Requires you to re login through argocd cli
+```sh
+kubectl -n argocd create secret generic argocd-homepage-token-temp \
+  --from-literal=token="$(argocd account generate-token --account homepage)" \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
