@@ -12,7 +12,7 @@ spec:
       services:
         - name: argocd-server
           port: 80
-    - match: Host(`argocd.rubberduckops.com`) && (PathPrefix(`/`) || PathPrefix('/swagger-ui')) # UI Calls
+    - match: Host(`argocd.rubberduckops.com`) && (PathPrefix(`/`) || PathPrefix('/swagger-ui') # UI Calls
       kind: Rule
       priority: 11
       services:
