@@ -1,0 +1,60 @@
+- name: Check Alloy binary
+  ansible.builtin.stat:
+    path: "{{ alloy_binary }}"
+  register: alloy_binary_stat
+
+- name: Install Alloy when absent
+  ansible.builtin.include_tasks: install.yml
+  when: not alloy_binary_stat.stat.exists
+
+- name: Explain first-install check mode limitation
+  ansible.builtin.debug:
+    msg: "Alloy is absent. Check mode cannot install/validate it; run a real deployment on this host first."
+  when: ansible_check_mode and not alloy_binary_stat.stat.exists
+
+- name: Skip remaining work for uninstalled hosts in check mode
+  ansible.builtin.meta: end_host
+  when: ansible_check_mode and not alloy_binary_stat.stat.exists
+
+- name: Optionally grant collection groups to the existing Alloy user
+  ansible.builtin.user:
+    name: "{{ alloy_service_user }}"
+    groups: "{{ alloy_supplementary_groups }}"
+    append: true
+    create_home: false
+  when: alloy_manage_groups | bool
+  notify: Restart Alloy
+
+- name: Ensure configuration directory exists
+  ansible.builtin.file:
+    path: "{{ alloy_config_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Validate and deploy Alloy configuration with timestamped backup
+  ansible.builtin.template:
+    src: config.alloy.j2
+    dest: "{{ alloy_config_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+    validate: "{{ alloy_binary }} validate %s"
+  register: alloy_config_result
+  notify: Restart Alloy
+
+- name: Report previous configuration backup
+  ansible.builtin.debug:
+    msg: "Previous configuration: {{ alloy_config_result.backup_file }}"
+  when: alloy_config_result.backup_file is defined
+
+- name: Apply pending restart
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure Alloy is enabled and running
+  ansible.builtin.systemd_service:
+    name: "{{ alloy_service_name }}"
+    enabled: true
+    state: started

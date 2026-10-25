@@ -1,0 +1,23 @@
+alloy_binary: /usr/bin/alloy
+alloy_config_path: /etc/alloy/config.alloy
+alloy_service_name: alloy
+alloy_host: "{{ inventory_hostname }}"
+alloy_environment: prod
+alloy_log_level: warn
+alloy_disabled_collectors: [mdadm]
+alloy_scrape_interval: 30s
+alloy_journal_enabled: true
+alloy_journal_services: {}
+alloy_docker_logs: false
+alloy_docker_service_overrides: {}
+alloy_otlp_enabled: false
+alloy_otlp_http_endpoint: 0.0.0.0:4318
+alloy_tempo_otlp_endpoint: ""
+alloy_file_logs: []
+alloy_app_scrapes: []
+# Optional: existing service user and supplementary groups to grant.
+# Docker group grants broad access to Docker; no permissions changed by default.
+alloy_manage_groups: true
+alloy_service_user: alloy
+alloy_supplementary_groups: [systemd-journal]
+alloy_package: alloy

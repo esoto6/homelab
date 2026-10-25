@@ -7,10 +7,10 @@ kubectl create namespace monitoring
 helm repo update
 
 Show Values;
-helm show values oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack > kubernetes/applications/monitoring/base/values.yaml
+helm show values oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack > talos/kubernetes/applications/monitoring/base/values.yaml
 
 
-helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f kubernetes/applications/monitoring/base/values.yaml
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f talos/kubernetes/applications/monitoring/base/values.yaml
 
 
 https://technotim.live/posts/kube-grafana-prometheus/
@@ -22,10 +22,10 @@ https://github.com/timothystewart6/launchpad/blob/master/kubernetes/kube-prometh
 
 
 
-kubectl kustomize kubernetes/apps/monitoring/overlays/dev --enable-helm
+kubectl kustomize talos/kubernetes/applications/monitoring/overlays/dev --enable-helm
 
 
-kubectl kustomize kubernetes/applications/monitoring/overlays/dev --enable-helm | kubectl apply -f -
+kubectl kustomize talos/kubernetes/applications/monitoring/overlays/dev --enable-helm | kubectl apply -f -
 
 
 Note:

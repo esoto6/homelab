@@ -1,0 +1,9 @@
+alloy_app_scrapes:
+  - name: traefik
+    address: 127.0.0.1:8082
+    instance: traefik:8082
+    service_name: traefik
+alloy_file_logs:
+  - name: traefik
+    path: /var/log/traefik/*.log
+    service_name: traefik

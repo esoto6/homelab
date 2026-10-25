@@ -1,0 +1,212 @@
+// Managed by Ansible. Edit inventory variables rather than this file.
+logging {
+  level = {{ alloy_log_level | to_json }}
+}
+
+prometheus.exporter.unix "default" {
+  include_exporter_metrics = true
+  disable_collectors = {{ alloy_disabled_collectors | to_json }}
+}
+
+// Give the host scrape a stable, unique identity on every LXC.
+discovery.relabel "node_metrics" {
+  targets = prometheus.exporter.unix.default.targets
+  rule {
+    target_label = "job"
+    replacement = "node"
+  }
+  rule {
+    target_label = "instance"
+    replacement = {{ alloy_host | to_json }}
+  }
+}
+
+prometheus.scrape "metrics" {
+  targets = discovery.relabel.node_metrics.output
+  scrape_interval = {{ alloy_scrape_interval | to_json }}
+  forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+prometheus.scrape "alloy" {
+  targets = [{
+    __address__ = "127.0.0.1:12345",
+    job = "alloy",
+    instance = {{ (alloy_host ~ ':12345') | to_json }},
+    service_name = "alloy",
+  }]
+  scrape_interval = {{ alloy_scrape_interval | to_json }}
+  forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+{% for app in alloy_app_scrapes %}
+prometheus.scrape {{ app.name | to_json }} {
+  targets = [{
+    __address__ = {{ app.address | to_json }},
+    job = {{ app.name | to_json }},
+    instance = {{ app.instance | to_json }},
+    service_name = {{ app.service_name | to_json }},
+  }]
+  metrics_path = {{ app.metrics_path | default('/metrics') | to_json }}
+  scrape_interval = {{ alloy_scrape_interval | to_json }}
+  forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+{% endfor %}
+prometheus.remote_write "prometheus" {
+  external_labels = {
+    host = {{ alloy_host | to_json }},
+    deployment_environment = {{ alloy_environment | to_json }},
+  }
+  endpoint {
+    url = {{ alloy_prometheus_url | to_json }}
+  }
+}
+
+loki.write "loki" {
+  endpoint {
+    url = {{ alloy_loki_url | to_json }}
+  }
+}
+{% if alloy_otlp_enabled %}
+otelcol.receiver.otlp "applications" {
+  http {
+    endpoint = {{ alloy_otlp_http_endpoint | to_json }}
+  }
+
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+    metrics = [otelcol.exporter.prometheus.applications.input]
+    logs = [otelcol.processor.filter.drop_otlp_logs.input]
+  }
+}
+
+otelcol.processor.filter "drop_otlp_logs" {
+  error_mode = "ignore"
+
+  log_conditions {
+    context = "log"
+    conditions = [`true`]
+  }
+
+  output {
+    logs = [otelcol.exporter.loki.otlp_logs.input]
+  }
+}
+
+otelcol.exporter.loki "otlp_logs" {
+  forward_to = [loki.write.loki.receiver]
+}
+
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = {{ alloy_tempo_otlp_endpoint | to_json }}
+
+    tls {
+      insecure = true
+    }
+  }
+}
+
+otelcol.exporter.prometheus "applications" {
+  resource_to_telemetry_conversion = true
+  forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+{% endif %}
+{% if alloy_journal_enabled %}
+loki.relabel "journal" {
+  forward_to = []
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    regex = "(.+)\\.service"
+    target_label = "service_name"
+    replacement = "$1"
+  }
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label = "unit"
+  }
+{% for unit, service in alloy_journal_services.items() %}
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    regex = {{ (unit | regex_escape) | to_json }}
+    target_label = "service_name"
+    replacement = {{ service | to_json }}
+  }
+{% endfor %}
+}
+
+loki.source.journal "systemd" {
+  relabel_rules = loki.relabel.journal.rules
+  labels = {
+    host = {{ alloy_host | to_json }},
+    job = "systemd",
+    deployment_environment = {{ alloy_environment | to_json }},
+  }
+  forward_to = [loki.write.loki.receiver]
+}
+{% endif %}
+{% for log in alloy_file_logs %}
+local.file_match {{ log.name | to_json }} {
+  path_targets = [{
+    __path__ = {{ log.path | to_json }},
+    host = {{ alloy_host | to_json }},
+    job = {{ log.name | to_json }},
+    service_name = {{ log.service_name | to_json }},
+    deployment_environment = {{ alloy_environment | to_json }},
+  }]
+}
+
+loki.source.file {{ log.name | to_json }} {
+  targets = local.file_match.{{ log.name }}.targets
+  forward_to = [loki.write.loki.receiver]
+}
+{% endfor %}
+{% if alloy_docker_logs %}
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "docker_logs" {
+  targets = discovery.docker.containers.targets
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex = "/(.+)"
+    target_label = "container"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex = "/(.+)"
+    target_label = "service_name"
+  }
+{% for container, service in alloy_docker_service_overrides.items() %}
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex = {{ ('/' ~ (container | regex_escape)) | to_json }}
+    target_label = "service_name"
+    replacement = {{ service | to_json }}
+  }
+{% endfor %}
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label = "compose_project"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label = "compose_service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_log_stream"]
+    target_label = "stream"
+  }
+}
+
+loki.source.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+  targets = discovery.docker.containers.targets
+  relabel_rules = discovery.relabel.docker_logs.rules
+  labels = {
+    host = {{ alloy_host | to_json }},
+    job = "docker",
+    deployment_environment = {{ alloy_environment | to_json }},
+  }
+  forward_to = [loki.write.loki.receiver]
+}
+{% endif %}

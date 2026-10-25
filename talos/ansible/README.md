@@ -1,7 +1,7 @@
 
-# Ansible
+# Talos Cluster Ansible
 
-This ansible script is utilized to initial start my cluster or initiate core components that are needed for almost every app within my cluster.
+This Ansible project bootstraps cluster-scoped services on the Talos Kubernetes cluster. It does not configure Proxmox hosts or LXC guests; those tasks belong under `proxmox/`.
 
 Apps:
 - Metallb (LoadBalancer)
@@ -36,7 +36,7 @@ ip_addresses: "192.168.1.xxx-192.168.1.xxx"
 1. Create Initial Apps
 Run playbook
 ```sh
-ansible-playbook ansible/cluster-setup.yaml
+ansible-playbook talos/ansible/cluster-setup.yaml
 ```
 
 ## Teardown Apps
@@ -44,4 +44,4 @@ ansible-playbook ansible/cluster-setup.yaml
 1. Teardown Ansible created Apps
 Reset Cluster
 ```sh
-ansible-playbook ansible/cluster-reset.yaml
+ansible-playbook talos/ansible/cluster-reset.yaml

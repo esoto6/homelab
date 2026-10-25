@@ -1,0 +1,3 @@
+alloy_prometheus_url: https://prometheus.rubberduckops.com/api/v1/write
+alloy_loki_url: https://loki.rubberduckops.com/loki/api/v1/push
+alloy_environment: prod

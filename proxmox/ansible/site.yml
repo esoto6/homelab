@@ -1,0 +1,6 @@
+- name: Configure existing Alloy installations
+  hosts: proxmox_lxcs
+  become: true
+  serial: 1
+  roles:
+    - alloy

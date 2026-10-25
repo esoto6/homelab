@@ -43,7 +43,7 @@ terraform.rc
 # Ansible
 *.log
 *.retry
-ansible/inventory.yml
+talos/ansible/inventory.yml
 
 *.ansible
 secrets.yml
@@ -52,9 +52,9 @@ secrets.yml
 #VS Code
 *.vscode
 
-kubernetes/old-test
+talos/kubernetes/old-test
 misc.md
-kubernetes/external-secrets/secret.yaml
+talos/kubernetes/external-secrets/secret.yaml
 
 charts*
 
@@ -66,3 +66,5 @@ metallb-system.yaml
 
 
 app-secrets.yaml
+
+proxmox/traefik

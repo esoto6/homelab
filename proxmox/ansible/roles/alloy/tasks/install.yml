@@ -1,0 +1,60 @@
+- name: Require Debian or Ubuntu family
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.os_family == 'Debian'
+    fail_msg: Automatic installation supports Debian/Ubuntu LXCs only.
+
+- name: Install repository prerequisites
+  ansible.builtin.apt:
+    name: [ca-certificates, gpg]
+    state: present
+  when: not ansible_check_mode
+
+- name: Create APT keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: not ansible_check_mode
+
+- name: Fetch official Grafana signing keys
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg-full.key
+    dest: /etc/apt/keyrings/grafana.asc
+    mode: '0644'
+  when: not ansible_check_mode
+
+- name: Convert Grafana signing key to APT keyring format
+  ansible.builtin.command:
+    argv:
+      - gpg
+      - --dearmor
+      - --batch
+      - --yes
+      - --output
+      - /etc/apt/keyrings/grafana.gpg
+      - /etc/apt/keyrings/grafana.asc
+  when: not ansible_check_mode
+
+- name: Set Grafana keyring permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/grafana.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+
+- name: Add official Grafana repository
+  ansible.builtin.copy:
+    content: "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main\n"
+    dest: /etc/apt/sources.list.d/grafana.list
+    mode: '0644'
+  when: not ansible_check_mode
+
+- name: Install Alloy without starting its default configuration
+  ansible.builtin.apt:
+    name: "{{ alloy_package }}"
+    state: present
+    update_cache: true
+    policy_rc_d: 101
+  when: not ansible_check_mode

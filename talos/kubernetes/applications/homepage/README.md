@@ -3,7 +3,7 @@
 # Apply with kustomize
 
 ```sh
-k apply -k kubernetes/applications/homepage/overlays/dev
+k apply -k talos/kubernetes/applications/homepage/overlays/dev
 ```
 
 # Get output from secret

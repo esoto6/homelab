@@ -15,33 +15,33 @@ spec:
           - list:
               elements:
                 - name: argocd
-                  path: kubernetes/applications/argocd
+                  path: talos/kubernetes/applications/argocd
                   namespace: argocd
                 - name: external-secrets
-                  path: kubernetes/applications/external-secrets
+                  path: talos/kubernetes/applications/external-secrets
                   namespace: external-secrets-system
                   overlay: base
                 - name: traefik
-                  path: kubernetes/applications/traefik
+                  path: talos/kubernetes/applications/traefik
                   namespace: traefik
                 - name: cert-manager
-                  path: kubernetes/applications/cert-manager
+                  path: talos/kubernetes/applications/cert-manager
                   namespace: cert-manager
                 - name: trivy-operator
                   namespace: trivy-system
-                  path: kubernetes/applications/trivy-operator
+                  path: talos/kubernetes/applications/trivy-operator
                   overlay: base
                 # - name: nginx 
-                #   path: kubernetes/applications/nginx
+                #   path: talos/kubernetes/applications/nginx
                 #   namespace: nginx
                 # - name: rancher
-                #   path: kubernetes/applications/rancher
+                #   path: talos/kubernetes/applications/rancher
                 #   namespace: cattle-system
                 - name: monitoring
-                  path: kubernetes/applications/monitoring
+                  path: talos/kubernetes/applications/monitoring
                   namespace: monitoring
                 - name: homepage
-                  path: kubernetes/applications/homepage
+                  path: talos/kubernetes/applications/homepage
                   namespace: homepage 
   template:
     metadata:
