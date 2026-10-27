@@ -1,0 +1,4 @@
+prometheus_self_target: localhost:9090
+prometheus_traefik_target: traefik:8082
+prometheus_proxmox_target: proxmox:8006
+prometheus_pve_exporter_target: prometheus-pve-exporter:9221

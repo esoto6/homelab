@@ -1,0 +1,51 @@
+- name: Check Prometheus configuration validator
+  ansible.builtin.command:
+    argv:
+      - "{{ prometheus_promtool_binary }}"
+      - --version
+  register: prometheus_promtool_check
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Require Prometheus configuration validator
+  ansible.builtin.assert:
+    that:
+      - prometheus_promtool_check.rc == 0
+    fail_msg: >-
+      Could not run {{ prometheus_promtool_binary }}. Set prometheus_promtool_binary
+      to the installed promtool path before managing the configuration.
+
+- name: Ensure Prometheus configuration directory exists
+  ansible.builtin.file:
+    path: "{{ prometheus_config_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Validate and deploy Prometheus configuration with timestamped backup
+  ansible.builtin.template:
+    src: prometheus.yaml.j2
+    dest: "{{ prometheus_config_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+    validate: "{{ prometheus_promtool_binary }} check config %s"
+  register: prometheus_config_result
+  notify: Restart Prometheus
+
+- name: Report previous Prometheus configuration backup
+  ansible.builtin.debug:
+    msg: "Previous configuration: {{ prometheus_config_result.backup_file }}"
+  when: prometheus_config_result.backup_file is defined
+
+- name: Apply pending Prometheus restart
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure Prometheus is enabled and running
+  ansible.builtin.systemd_service:
+    name: "{{ prometheus_service_name }}"
+    enabled: true
+    state: started

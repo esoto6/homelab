@@ -16,6 +16,14 @@
   ansible.builtin.meta: end_host
   when: ansible_check_mode and not alloy_binary_stat.stat.exists
 
+- name: Verify Alloy binary is executable
+  ansible.builtin.command:
+    argv:
+      - "{{ alloy_binary }}"
+      - --version
+  changed_when: false
+  check_mode: false
+
 - name: Optionally grant collection groups to the existing Alloy user
   ansible.builtin.user:
     name: "{{ alloy_service_user }}"
@@ -29,9 +37,6 @@
   ansible.builtin.file:
     path: "{{ alloy_config_path | dirname }}"
     state: directory
-    owner: root
-    group: root
-    mode: '0755'
 
 - name: Validate and deploy Alloy configuration with timestamped backup
   ansible.builtin.template:

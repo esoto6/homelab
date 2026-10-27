@@ -1,0 +1,12 @@
+prometheus_promtool_binary: promtool
+prometheus_config_path: /etc/prometheus/prometheus.yml
+prometheus_service_name: prometheus
+
+prometheus_scrape_interval: 15s
+prometheus_evaluation_interval: 15s
+
+prometheus_self_target: localhost:9090
+prometheus_traefik_target: ""
+prometheus_proxmox_target: ""
+prometheus_pve_exporter_target: ""
+prometheus_pve_module: default
