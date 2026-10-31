@@ -210,3 +210,31 @@ loki.source.docker "containers" {
   forward_to = [loki.write.loki.receiver]
 }
 {% endif %}
+{% if alloy_hermes_gateway_enabled %}
+// Hermes content-free monitoring; local OTLP ingestion only.
+otelcol.receiver.otlp "hermes_gateway" {
+  http {
+    endpoint = {{ alloy_hermes_gateway_http_endpoint | to_json }}
+  }
+  output {
+    metrics = [otelcol.exporter.prometheus.hermes_gateway.input]
+    logs = [otelcol.exporter.loki.hermes_gateway.input]
+    traces = [otelcol.exporter.otlphttp.hermes_gateway.input]
+  }
+}
+
+otelcol.exporter.prometheus "hermes_gateway" {
+  resource_to_telemetry_conversion = true
+  forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+otelcol.exporter.loki "hermes_gateway" {
+  forward_to = [loki.write.loki.receiver]
+}
+
+otelcol.exporter.otlphttp "hermes_gateway" {
+  client {
+    endpoint = {{ alloy_hermes_gateway_tempo_endpoint | to_json }}
+  }
+}
+{% endif %}

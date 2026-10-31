@@ -1,0 +1,4 @@
+# Preserve CT124's verified local gateway monitoring pipeline.
+# Keep the generic application receiver disabled: it drops OTLP logs.
+alloy_hermes_gateway_enabled: true
+alloy_hermes_gateway_tempo_endpoint: "{{ hermes_tempo_otlp_http_endpoint }}"

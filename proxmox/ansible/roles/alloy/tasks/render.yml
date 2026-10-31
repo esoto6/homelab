@@ -1,0 +1,15 @@
+# Offline test entrypoint; site.yml continues to use tasks/main.yml.
+- name: Require an explicit local render destination
+  ansible.builtin.assert:
+    that:
+      - alloy_test_output is defined
+      - alloy_test_output is match('^/')
+      - ansible_connection == 'local'
+
+- name: Render candidate configuration on the controller only
+  ansible.builtin.template:
+    src: config.alloy.j2
+    dest: "{{ alloy_test_output }}/{{ inventory_hostname }}.alloy"
+    mode: '0600'
+  delegate_to: localhost
+  become: false

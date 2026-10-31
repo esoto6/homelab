@@ -1,0 +1,10 @@
+- name: Render inventory configuration locally without contacting guests
+  hosts: alloy_lxc
+  gather_facts: false
+  connection: local
+  become: false
+  tasks:
+    - name: Load real Alloy role defaults and render-only tasks
+      ansible.builtin.import_role:
+        name: alloy
+        tasks_from: render
